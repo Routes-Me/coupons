@@ -174,5 +174,10 @@ namespace CouponService.Helper.Repository
             var officerList = lstOfficer.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
             return Common.SerializeJsonForIncludedRepo(officerList.Cast<dynamic>().ToList());
         }
+
+        public string GetOfficerUserFromInstitution(string institutionId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

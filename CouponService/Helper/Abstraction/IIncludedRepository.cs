@@ -15,6 +15,7 @@ namespace CouponService.Helper.Abstraction
         dynamic GetCouponIncludedData(List<RedemptionModel> redemptionModelList);
         dynamic GetOfficerIncludedData(List<RedemptionModel> redemptionModelList);
         dynamic GetPromotionIncludedData(List<CouponsModel> placeModelList);
+        string GetOfficerUserFromInstitution(string institutionId);
         //dynamic GetPromotionIncludedData(List<RedemptionModel> redemptionModelList);
     }
 }

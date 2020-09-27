@@ -52,40 +52,76 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetCoupons(string id, Pagination pageInfo, string includeType)
+        public dynamic GetCoupons(string id, string userId, Pagination pageInfo, string includeType)
         {
             CouponGetResponse response = new CouponGetResponse();
             int totalCount = 0;
             try
             {
                 List<CouponsModel> placeModelList = new List<CouponsModel>();
-                if (Convert.ToInt32(id) == 0)
-                {
-                    placeModelList = (from coupon in _context.Coupons
-                                      select new CouponsModel()
-                                      {
-                                          CouponId = coupon.CouponId.ToString(),
-                                          PromotionId = coupon.PromotionId.ToString(),
-                                          CreatedAt = coupon.CreatedAt,
-                                          UserId = coupon.UserId.ToString()
-                                      }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Coupons.ToList().Count();
+                if (Convert.ToInt32(userId) == 0)
+                {
+                    if (Convert.ToInt32(id) == 0)
+                    {
+                        placeModelList = (from coupon in _context.Coupons
+                                          select new CouponsModel()
+                                          {
+                                              CouponId = coupon.CouponId.ToString(),
+                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CreatedAt = coupon.CreatedAt,
+                                              UserId = coupon.UserId.ToString()
+                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Coupons.ToList().Count();
+                    }
+                    else
+                    {
+                        placeModelList = (from coupon in _context.Coupons
+                                          where coupon.CouponId == Convert.ToInt32(id)
+                                          select new CouponsModel()
+                                          {
+                                              CouponId = coupon.CouponId.ToString(),
+                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CreatedAt = coupon.CreatedAt,
+                                              UserId = coupon.UserId.ToString()
+                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
+                    }
                 }
                 else
                 {
-                    placeModelList = (from coupon in _context.Coupons
-                                      where coupon.CouponId == Convert.ToInt32(id)
-                                      select new CouponsModel()
-                                      {
-                                          CouponId = coupon.CouponId.ToString() ,
-                                          PromotionId = coupon.PromotionId.ToString(),
-                                          CreatedAt = coupon.CreatedAt,
-                                          UserId = coupon.UserId.ToString()
-                                      }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (Convert.ToInt32(id) == 0)
+                    {
+                        placeModelList = (from coupon in _context.Coupons
+                                          where coupon.UserId == Convert.ToInt32(userId)
+                                          select new CouponsModel()
+                                          {
+                                              CouponId = coupon.CouponId.ToString(),
+                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CreatedAt = coupon.CreatedAt,
+                                              UserId = coupon.UserId.ToString()
+                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
+                        totalCount = _context.Coupons.ToList().Count();
+                    }
+                    else
+                    {
+                        placeModelList = (from coupon in _context.Coupons
+                                          where coupon.CouponId == Convert.ToInt32(id) && coupon.UserId == Convert.ToInt32(userId)
+                                          select new CouponsModel()
+                                          {
+                                              CouponId = coupon.CouponId.ToString(),
+                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CreatedAt = coupon.CreatedAt,
+                                              UserId = coupon.UserId.ToString()
+                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
+                    }
                 }
+
 
                 if (placeModelList == null || placeModelList.Count == 0)
                     return ReturnResponse.ErrorResponse(CommonMessage.CouponsNotFound, StatusCodes.Status404NotFound);
