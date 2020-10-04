@@ -247,7 +247,7 @@ namespace CouponService.Repository
                     EndAt = model.EndAt,
                     IsSharable = model.IsSharable,
                     InstitutionId = Convert.ToInt32(model.InstitutionId),
-                    CreatedAt = model.CreatedAt,
+                    CreatedAt = DateTime.Now,
                     QrCodeUrl = model.QrCodeUrl,
                     StartAt = model.StartAt,
                     Subtitle = model.Subtitle,

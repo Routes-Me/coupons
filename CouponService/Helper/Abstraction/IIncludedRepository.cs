@@ -12,10 +12,10 @@ namespace CouponService.Helper.Abstraction
         dynamic GetUsersIncludedData(List<CouponsModel> objDriversModelList);
         dynamic GetAdvertisementsIncludedData(List<PromotionsModel> promotionsModelList);
         dynamic GetInstitutionsIncludedData(List<PromotionsModel> authoritiesModelList);
-        dynamic GetCouponIncludedData(List<RedemptionModel> redemptionModelList);
-        dynamic GetOfficerIncludedData(List<RedemptionModel> redemptionModelList);
+        dynamic GetCouponIncludedData(List<RedemptionGetModel> redemptionModelList);
+        dynamic GetOfficerIncludedData(List<RedemptionGetModel> redemptionModelList);
+        dynamic GetOfficerData(string officerId);
+        dynamic GetPinData(string institutionId);
         dynamic GetPromotionIncludedData(List<CouponsModel> placeModelList);
-        string GetOfficerUserFromInstitution(string institutionId);
-        //dynamic GetPromotionIncludedData(List<RedemptionModel> redemptionModelList);
     }
 }

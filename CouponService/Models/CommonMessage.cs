@@ -34,7 +34,9 @@
         public static string RedemptionInsert = "Redemption inserted successfully.";
         public static string RedemptionUpdate = "Redemption updated successfully.";
         public static string RedemptionAssociated = "Redemption is associated with other coupons.";
+        public static string PinInvalid = "Pin is invalid.";
         public static string OfficerDoNotBelong = "Officer does not belong to this institution.";
+        public static string OfficerNotFound = "Officer not found.";
         public static string ExceptionMessage = "Something went wrong. Error Message - ";
     }
 }

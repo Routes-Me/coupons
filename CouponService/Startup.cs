@@ -42,22 +42,17 @@ namespace CouponService
             {
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
             });
-
+            
             services.AddScoped<ICouponsRepository, CouponsRepository>();
             services.AddScoped<IPlacesRepository, PlacesRepository>();
             services.AddScoped<IAuthoritiesRepository, AuthoritiesRepository>();
             services.AddScoped<IPromotionsRepository, PromotionsRepository>();
             services.AddScoped<IIncludedRepository, IncludedRepository>();
+            services.AddScoped<IRedemptionRepository, RedemptionRepository>();
 
-            var azureConfigSection = Configuration.GetSection("AzureStorageBlobConfig");
-            services.Configure<AzureStorageBlobConfig>(azureConfigSection);
-            var azureConfig = azureConfigSection.Get<AzureStorageBlobConfig>();
-
-            var dependenciessSection = Configuration.GetSection("Dependencies");
-            services.Configure<Dependencies>(dependenciessSection);
-
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
+            services.Configure<AzureStorageBlobConfig>(Configuration.GetSection("AzureStorageBlobConfig"));
+            services.Configure<Dependencies>(Configuration.GetSection("Dependencies"));
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

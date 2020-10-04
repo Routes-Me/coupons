@@ -134,11 +134,11 @@ namespace CouponService.Repository
                     {
                         foreach (var item in includeArr)
                         {
-                            if (item.ToLower() == "user")
+                            if (item.ToLower() == "user" || item.ToLower() == "users")
                             {
                                 includeData.users = _includedRepository.GetUsersIncludedData(placeModelList);
                             }
-                            else if (item.ToLower() == "promotion")
+                            else if (item.ToLower() == "promotion" || item.ToLower() == "promotions")
                             {
                                 includeData.promotions = _includedRepository.GetPromotionIncludedData(placeModelList);
                             }
