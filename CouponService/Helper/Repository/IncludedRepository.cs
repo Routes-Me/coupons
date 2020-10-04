@@ -1,5 +1,6 @@
 ﻿using CouponService.Helper.Abstraction;
 using CouponService.Helper.Model;
+using CouponService.Models;
 using CouponService.Models.DBModels;
 using CouponService.Models.ResponseModel;
 using Microsoft.Extensions.Options;
@@ -83,27 +84,44 @@ namespace CouponService.Helper.Repository
             return Common.SerializeJsonForIncludedRepo(institutionsList.Cast<dynamic>().ToList());
         }
 
-        public dynamic GetCouponIncludedData(List<RedemptionModel> redemptionModelList)
+        public dynamic GetCouponIncludedData(List<RedemptionGetModel> redemptionModelList)
         {
-            List<CouponsModel> coupons = new List<CouponsModel>();
+            List<CouponWithUser> lstCouponWithUser = new List<CouponWithUser>();
+            List<Coupons> coupons = new List<Coupons>();
+            List<UserModel> lstUsers = new List<UserModel>();
             foreach (var item in redemptionModelList)
             {
                 var couponsDetails = (from coupon in _context.Coupons
                                       where coupon.CouponId == Convert.ToInt32(item.CouponId)
-                                      select new CouponsModel()
+                                      select new Coupons()
                                       {
-                                          CouponId = coupon.CouponId.ToString(),
+                                          CouponId = coupon.CouponId,
+                                          PromotionId = coupon.PromotionId,
+                                          UserId = coupon.UserId,
                                           CreatedAt = coupon.CreatedAt,
-                                          PromotionId = coupon.PromotionId.ToString(),
-                                          UserId = coupon.UserId.ToString()
-                                      }).ToList().FirstOrDefault();
-
-                if (couponsDetails != null)
-                    if (coupons.Where(x => x.CouponId == couponsDetails.CouponId).FirstOrDefault() == null)
-                        coupons.Add(couponsDetails);
-
+                                          Promotion = coupon.Promotion
+                                      }).FirstOrDefault();
+                coupons.Add(couponsDetails);
             }
-            return Common.SerializeJsonForIncludedRepo(coupons.Cast<dynamic>().ToList());
+            var couponsList = coupons.GroupBy(x => x.CouponId).Select(a => a.First()).ToList();
+            foreach (var item in couponsList)
+            {
+                var client = new RestClient(_appSettings.Host + _dependencies.UserUrl + item.UserId);
+                var request = new RestRequest(Method.GET);
+                IRestResponse response = client.Execute(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    var result = response.Content;
+                    var userData = JsonConvert.DeserializeObject<UserData>(result);
+                    lstUsers.AddRange(userData.data);
+                }
+            }
+            var usersList = lstUsers.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
+            CouponWithUser couponWithUser = new CouponWithUser();
+            couponWithUser.coupons = couponsList;
+            couponWithUser.users = usersList;
+            lstCouponWithUser.Add(couponWithUser);
+            return Common.SerializeJsonForIncludedRepo(lstCouponWithUser.Cast<dynamic>().ToList());
         }
 
         public dynamic GetPromotionIncludedData(List<CouponsModel> couponsModelList)
@@ -129,7 +147,7 @@ namespace CouponService.Helper.Repository
                                           InstitutionId = Convert.ToString(promotions.InstitutionId),
                                           IsSharable = promotions.IsSharable,
                                           LogoUrl = promotions.LogoUrl,
-                                      }).ToList().FirstOrDefault();
+                                      }).FirstOrDefault();
 
                 promotion.Add(couponsDetails);
             }
@@ -156,7 +174,7 @@ namespace CouponService.Helper.Repository
             return Common.SerializeJsonForIncludedRepo(usersList.Cast<dynamic>().ToList());
         }
 
-        public dynamic GetOfficerIncludedData(List<RedemptionModel> redemptionModelList)
+        public dynamic GetOfficerIncludedData(List<RedemptionGetModel> redemptionModelList)
         {
             List<OfficerModel> lstOfficer = new List<OfficerModel>();
             foreach (var item in redemptionModelList)
@@ -173,6 +191,36 @@ namespace CouponService.Helper.Repository
             }
             var officerList = lstOfficer.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
             return Common.SerializeJsonForIncludedRepo(officerList.Cast<dynamic>().ToList());
+        }
+
+        public dynamic GetOfficerData(string officerId)
+        {
+            List<OfficerModel> lstOfficer = new List<OfficerModel>();
+            var client = new RestClient(_appSettings.Host + _dependencies.OfficersUrl + officerId);
+            var request = new RestRequest(Method.GET);
+            IRestResponse response = client.Execute(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var result = response.Content;
+                var officerData = JsonConvert.DeserializeObject<OfficerData>(result);
+                lstOfficer.AddRange(officerData.data);
+            }
+            return lstOfficer;
+        }
+
+        public dynamic GetPinData(string institutionId)
+        {
+            List<AuthoritiesModel> lstAuthorities = new List<AuthoritiesModel>();
+            var client = new RestClient((_appSettings.Host + _dependencies.AuthoritiesUrl).Replace("__id", institutionId));
+            var request = new RestRequest(Method.GET);
+            IRestResponse response = client.Execute(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var result = response.Content;
+                var authoritiesData = JsonConvert.DeserializeObject<AuthoritiesData>(result);
+                lstAuthorities.AddRange(authoritiesData.data);
+            }
+            return lstAuthorities;
         }
     }
 }

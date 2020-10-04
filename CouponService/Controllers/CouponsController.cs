@@ -26,15 +26,15 @@ namespace CouponService.Controllers
 
         [HttpGet]
         [Route("coupons/{id=0}")]
-        public IActionResult Get(string id,string Include, [FromQuery] Pagination pageInfo)
+        public IActionResult Get(string id, string userId, string Include, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _couponsRepository.GetCoupons(id, pageInfo, Include);
+            dynamic response = _couponsRepository.GetCoupons(id, userId, pageInfo, Include);
             return StatusCode((int)response.statusCode, response);
         }
 
         [HttpDelete]
         [Route("coupons/{id}")]
-        public IActionResult Delete(string id)
+        public IActionResult Delete(string id)  
         {
             dynamic response = _couponsRepository.DeleteCoupons(id);
             return StatusCode((int)response.statusCode, response);

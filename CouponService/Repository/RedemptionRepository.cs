@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using static CouponService.Models.ReturnResponse;
 
 namespace CouponService.Repository
 {
@@ -24,12 +23,12 @@ namespace CouponService.Repository
         private readonly AppSettings _appSettings;
         private readonly Dependencies _dependencies;
         private readonly IIncludedRepository _includedRepository;
-        public RedemptionRepository(IOptions<AppSettings> appSettings, couponserviceContext context, IIncludedRepository includedRepository, Dependencies dependencies)
+        public RedemptionRepository(IOptions<AppSettings> appSettings, couponserviceContext context, IIncludedRepository includedRepository, IOptions<Dependencies> dependencies)
         {
             _context = context;
-            _appSettings = appSettings.Value;
             _includedRepository = includedRepository;
-            _dependencies = dependencies;
+            _appSettings = appSettings.Value;
+            _dependencies = dependencies.Value;
         }
 
         public dynamic DeleteRedemption(string id)
@@ -53,39 +52,74 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetRedemption(string id, Pagination pageInfo, string includedType)
+        public dynamic GetRedemption(string id, string officerId, Pagination pageInfo, string includedType)
         {
             RedemptionGetResponse response = new RedemptionGetResponse();
             int totalCount = 0;
             try
             {
-                List<RedemptionModel> redemptionModelList = new List<RedemptionModel>();
-                if (Convert.ToInt32(id) == 0)
-                {
-                    redemptionModelList = (from redemption in _context.Redemptions
-                                            select new RedemptionModel()
-                                            {
-                                                RedemptionId = redemption.RedemptionId.ToString(),
-                                                CouponId = redemption.CouponId.ToString(),
-                                                OfficerId = redemption.OfficerId.ToString(),
-                                                CreatedAt = redemption.CreatedAt
-                                            }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                List<RedemptionGetModel> redemptionModelList = new List<RedemptionGetModel>();
 
-                    totalCount = _context.Redemptions.ToList().Count();
+                if (Convert.ToInt32(officerId) == 0)
+                {
+                    if (Convert.ToInt32(id) == 0)
+                    {
+                        redemptionModelList = (from redemption in _context.Redemptions
+                                               select new RedemptionGetModel()
+                                               {
+                                                   RedemptionId = redemption.RedemptionId.ToString(),
+                                                   CouponId = redemption.CouponId.ToString(),
+                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   CreatedAt = redemption.CreatedAt
+                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Redemptions.ToList().Count();
+                    }
+                    else
+                    {
+                        redemptionModelList = (from redemption in _context.Redemptions
+                                               where redemption.RedemptionId == Convert.ToInt32(id)
+                                               select new RedemptionGetModel()
+                                               {
+                                                   RedemptionId = redemption.RedemptionId.ToString(),
+                                                   CouponId = redemption.CouponId.ToString(),
+                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   CreatedAt = redemption.CreatedAt
+                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Redemptions.Where(x => x.RedemptionId == Convert.ToInt32(id)).ToList().Count();
+                    }
                 }
                 else
                 {
-                    redemptionModelList = (from redemption in _context.Redemptions
-                                           where redemption.RedemptionId == Convert.ToInt32(id)
-                                           select new RedemptionModel()
-                                           {
-                                               RedemptionId = redemption.RedemptionId.ToString(),
-                                               CouponId = redemption.CouponId.ToString(),
-                                               OfficerId = redemption.OfficerId.ToString(),
-                                               CreatedAt = redemption.CreatedAt
-                                           }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (Convert.ToInt32(id) == 0)
+                    {
+                        redemptionModelList = (from redemption in _context.Redemptions
+                                               where redemption.OfficerId == Convert.ToInt32(officerId)
+                                               select new RedemptionGetModel()
+                                               {
+                                                   RedemptionId = redemption.RedemptionId.ToString(),
+                                                   CouponId = redemption.CouponId.ToString(),
+                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   CreatedAt = redemption.CreatedAt
+                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Redemptions.Where(x => x.RedemptionId == Convert.ToInt32(id)).ToList().Count();
+                        totalCount = _context.Redemptions.Where(x => x.OfficerId == Convert.ToInt32(officerId)).ToList().Count();
+                    }
+                    else
+                    {
+                        redemptionModelList = (from redemption in _context.Redemptions
+                                               where redemption.RedemptionId == Convert.ToInt32(id) && redemption.OfficerId == Convert.ToInt32(officerId)
+                                               select new RedemptionGetModel()
+                                               {
+                                                   RedemptionId = redemption.RedemptionId.ToString(),
+                                                   CouponId = redemption.CouponId.ToString(),
+                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   CreatedAt = redemption.CreatedAt
+                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Redemptions.Where(x => x.RedemptionId == Convert.ToInt32(id) && x.OfficerId == Convert.ToInt32(officerId)).ToList().Count();
+                    }
                 }
 
                 if (redemptionModelList == null || redemptionModelList.Count == 0)
@@ -142,29 +176,38 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var coupon = _context.Coupons.Include(x => x.Promotion).Where(x => x.CouponId == Convert.ToInt32(model.CouponId)).FirstOrDefault();
+                var coupon = _context.Coupons.Include(x => x.Promotion).Include(x => x.Redemptions).Where(x => x.CouponId == Convert.ToInt32(model.CouponId)).FirstOrDefault();
                 if (coupon == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.CouponsNotFound, StatusCodes.Status404NotFound);
 
-                OfficerModel officer = new OfficerModel();
-                var client = new RestClient(_appSettings.Host + _dependencies.OfficersUrl + model.OfficerId);
-                var request = new RestRequest(Method.GET);
-                IRestResponse response = client.Execute(request);
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (coupon.Redemptions.Count() > 0)
                 {
-                    var result = response.Content;
-                    var officerData = JsonConvert.DeserializeObject<OfficerData>(result);
-                    officer = officerData.data.FirstOrDefault();
+                    var timeDifference = (coupon.Redemptions.OrderByDescending(x => x.CreatedAt).FirstOrDefault().CreatedAt - DateTime.Now.AddHours(-14));
+                    if (timeDifference.Value.TotalMinutes > 0)
+                        return ReturnResponse.ErrorResponse(CommonMessage.CouponsRedeemed, StatusCodes.Status400BadRequest);
                 }
-
-                if (Convert.ToInt32(officer.InstitutionId) == coupon.Promotion.InstitutionId)
-                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerDoNotBelong, StatusCodes.Status400BadRequest);
 
                 if (coupon.Promotion.EndAt < DateTime.Now)
                     return ReturnResponse.ErrorResponse(CommonMessage.CouponsExpired, StatusCodes.Status400BadRequest);
 
                 if (coupon.Promotion.StartAt > DateTime.Now)
                     return ReturnResponse.ErrorResponse(CommonMessage.CouponsBeforeStartDate, StatusCodes.Status400BadRequest);
+
+                List<OfficerModel> officers = new List<OfficerModel>();
+                officers = _includedRepository.GetOfficerData(model.OfficerId);
+                if (officers == null || officers.Count() == 0)
+                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
+
+                if (coupon.Promotion.InstitutionId != Convert.ToInt32(officers.FirstOrDefault().InstitutionId))
+                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerDoNotBelong, StatusCodes.Status400BadRequest);
+
+                List<AuthoritiesModel> authorities = new List<AuthoritiesModel>();
+                authorities = _includedRepository.GetPinData(model.OfficerId);
+                if (authorities == null || authorities.Count() == 0)
+                    return ReturnResponse.ErrorResponse(CommonMessage.AuthoritiesNotFound, StatusCodes.Status404NotFound);
+
+                if (authorities.FirstOrDefault().Pin != model.Pin)
+                        return ReturnResponse.ErrorResponse(CommonMessage.PinInvalid, StatusCodes.Status404NotFound);
 
                 Redemptions redemption = new Redemptions()
                 {
@@ -174,30 +217,12 @@ namespace CouponService.Repository
                 };
                 _context.Redemptions.Add(redemption);
                 _context.SaveChanges();
-                return ReturnResponse.SuccessResponse(CommonMessage.AuthoritiesInsert, true);
-            }
-            catch (Exception ex)
-            {
-                return ReturnResponse.ExceptionResponse(ex);
-            }
-        }
-
-        public dynamic UpdateRedemption(RedemptionModel model)
-        {
-            try
-            {
-                if (model == null)
-                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
-
-                var redemptions = _context.Redemptions.Where(x => x.RedemptionId == Convert.ToInt32(model.RedemptionId)).FirstOrDefault();
-                if (redemptions == null)
-                    return ReturnResponse.ErrorResponse(CommonMessage.RedemptionNotFound, StatusCodes.Status404NotFound);
-
-                redemptions.OfficerId = Convert.ToInt32(model.OfficerId);
-                redemptions.CouponId = Convert.ToInt32(model.CouponId);
-                _context.Redemptions.Update(redemptions);
-                _context.SaveChanges();
-                return ReturnResponse.SuccessResponse(CommonMessage.AuthoritiesUpdate, false);
+                RedemptionResponse response = new RedemptionResponse();
+                response.status = true;
+                response.message = CommonMessage.RedemptionInsert;
+                response.statusCode = StatusCodes.Status201Created;
+                response.RedemptionId = Convert.ToString(redemption.RedemptionId);
+                return response;
             }
             catch (Exception ex)
             {

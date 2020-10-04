@@ -130,7 +130,6 @@ namespace CouponService.Repository
 
                 Authorities authority = new Authorities()
                 {
-                    AuthorityId = Convert.ToInt32(model.AuthorityId),
                     InstitutionId = Convert.ToInt32(model.InstitutionId),
                     Pin = model.Pin
                 };
@@ -155,7 +154,6 @@ namespace CouponService.Repository
                 if (authorities == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.AuthoritiesNotFound, StatusCodes.Status404NotFound);
 
-                authorities.AuthorityId = Convert.ToInt32(model.AuthorityId);
                 authorities.InstitutionId = Convert.ToInt32(model.InstitutionId);
                 authorities.Pin = model.Pin;
                 _context.Authorities.Update(authorities);
