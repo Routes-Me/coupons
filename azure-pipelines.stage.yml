@@ -3,38 +3,37 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-  - development
+- development
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'f1d159b3-6388-4666-9666-31a4f690ed2e'
+  imageRepository: 'couponsservice'
+  containerRegistry: 'stagenoruaebscontainerregistry.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/CouponService/Dockerfile'
+  tag: '$(Build.BuildId)'
   
-  resources:
-  - repo: self
-  
-  variables:
-    # Container registry service connection established during pipeline creation
-    dockerRegistryServiceConnection: 'f4aeec10-4cb1-4f6a-a306-fa3568e223cb'
-    imageRepository: 'couponsservice'
-    containerRegistry: 'stagenoruaebscontainerregistry.azurecr.io'
-    dockerfilePath: '**/Dockerfile'
-    tag: '$(Build.BuildId)'
-    
-    # Agent VM image name
-    vmImageName: 'ubuntu-latest'
-  
-  stages:
-  - stage: Build
-    displayName: Build and push stage
-    jobs:  
-    - job: Build
-      displayName: Build
-      pool:
-        vmImage: $(vmImageName)
-      steps:
-      - task: Docker@2
-        displayName: Build and push an image to container registry
-        inputs:
-          command: buildAndPush
-          repository: $(imageRepository)
-          dockerfile: $(dockerfilePath)
-          containerRegistry: $(dockerRegistryServiceConnection)
-          tags: |
-            $(tag)
-  
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:  
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
