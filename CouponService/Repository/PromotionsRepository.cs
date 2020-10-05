@@ -220,10 +220,6 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var place = _context.Places.Where(x => x.PlaceId == Convert.ToInt32(model.PlaceId)).FirstOrDefault();
-                if (place == null)
-                    return ReturnResponse.ErrorResponse(CommonMessage.PlacesNotFound, StatusCodes.Status404NotFound);
-
                 Promotions promotion = new Promotions()
                 {
                     AdvertisementId = Convert.ToInt32(model.AdvertisementId),
