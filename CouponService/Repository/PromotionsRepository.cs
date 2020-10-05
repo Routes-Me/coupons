@@ -10,9 +10,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using static CouponService.Models.ReturnResponse;
 
 namespace CouponService.Repository
 {
@@ -113,11 +111,11 @@ namespace CouponService.Repository
                     {
                         foreach (var item in includeArr)
                         {
-                            if (item.ToLower() == "advertisement")
+                            if (item.ToLower() == "advertisement" || item.ToLower() == "advertisements")
                             {
                                 includeData.advertisements = _includedRepository.GetAdvertisementsIncludedData(promotionsModelList);
                             }
-                            else if (item.ToLower() == "institution")
+                            else if (item.ToLower() == "institution" || item.ToLower() == "institutions")
                             {
                                 includeData.institutions = _includedRepository.GetInstitutionsIncludedData(promotionsModelList);
                             }
@@ -287,7 +285,7 @@ namespace CouponService.Repository
                 _context.Promotions.Update(promotion);
                 _context.PromotionsPlaces.Update(promotionPlace);
                 _context.SaveChanges();
-                return ReturnResponse.SuccessResponse(CommonMessage.PlacesUpdate, false);
+                return ReturnResponse.SuccessResponse(CommonMessage.PromotionsUpdate, false);
             }
             catch (Exception ex)
             {
