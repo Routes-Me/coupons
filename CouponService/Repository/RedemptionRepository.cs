@@ -185,6 +185,14 @@ namespace CouponService.Repository
                         return ReturnResponse.ErrorResponse(CommonMessage.CouponsRedeemed, StatusCodes.Status400BadRequest);
                 }
 
+                List<AuthoritiesModel> authorities = new List<AuthoritiesModel>();
+                authorities = _includedRepository.GetPinData(model.OfficerId);
+                if (authorities == null || authorities.Count() == 0)
+                    return ReturnResponse.ErrorResponse(CommonMessage.AuthoritiesNotFound, StatusCodes.Status404NotFound);
+
+                if (authorities.FirstOrDefault().Pin != model.Pin)
+                    return ReturnResponse.ErrorResponse(CommonMessage.PinInvalid, StatusCodes.Status404NotFound);
+
                 if (coupon.Promotion.EndAt < DateTime.Now)
                     return ReturnResponse.ErrorResponse(CommonMessage.CouponsExpired, StatusCodes.Status400BadRequest);
 
@@ -199,13 +207,7 @@ namespace CouponService.Repository
                 if (coupon.Promotion.InstitutionId != Convert.ToInt32(officers.FirstOrDefault().InstitutionId))
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerDoNotBelong, StatusCodes.Status400BadRequest);
 
-                List<AuthoritiesModel> authorities = new List<AuthoritiesModel>();
-                authorities = _includedRepository.GetPinData(model.OfficerId);
-                if (authorities == null || authorities.Count() == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.AuthoritiesNotFound, StatusCodes.Status404NotFound);
-
-                if (authorities.FirstOrDefault().Pin != model.Pin)
-                        return ReturnResponse.ErrorResponse(CommonMessage.PinInvalid, StatusCodes.Status404NotFound);
+             
 
                 Redemptions redemption = new Redemptions()
                 {
