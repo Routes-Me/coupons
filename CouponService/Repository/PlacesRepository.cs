@@ -78,8 +78,6 @@ namespace CouponService.Repository
                     totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
                 }
 
-                if (placeModelList == null || placeModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.PlacesNotFound, StatusCodes.Status404NotFound);
 
                 var page = new Pagination
                 {

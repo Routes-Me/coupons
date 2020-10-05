@@ -121,11 +121,7 @@ namespace CouponService.Repository
                         totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
                     }
                 }
-
-
-                if (placeModelList == null || placeModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.CouponsNotFound, StatusCodes.Status404NotFound);
-
+               
                 dynamic includeData = new JObject();
                 if (!string.IsNullOrEmpty(includeType))
                 {

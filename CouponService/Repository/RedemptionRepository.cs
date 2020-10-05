@@ -122,9 +122,7 @@ namespace CouponService.Repository
                     }
                 }
 
-                if (redemptionModelList == null || redemptionModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.RedemptionNotFound, StatusCodes.Status404NotFound);
-
+               
                 dynamic includeData = new JObject();
                 if (!string.IsNullOrEmpty(includedType))
                 {

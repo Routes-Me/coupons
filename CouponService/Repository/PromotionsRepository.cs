@@ -102,10 +102,6 @@ namespace CouponService.Repository
 
                     totalCount = _context.Promotions.Where(x => x.PromotionId == Convert.ToInt32(id)).ToList().Count();
                 }
-
-                if (promotionsModelList == null || promotionsModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.PromotionsNotFound, StatusCodes.Status404NotFound);
-
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
