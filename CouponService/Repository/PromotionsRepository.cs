@@ -235,7 +235,6 @@ namespace CouponService.Repository
                     StartAt = model.StartAt,
                     Subtitle = model.Subtitle,
                     Title = model.Title,
-                    UpdatedAt = model.UpdatedAt,
                     UsageLimit = model.UsageLimit
                 };
                 _context.Promotions.Add(promotion);
@@ -278,13 +277,11 @@ namespace CouponService.Repository
                 promotion.EndAt = model.EndAt;
                 promotion.IsSharable = model.IsSharable;
                 promotion.InstitutionId = Convert.ToInt32(model.InstitutionId);
-                promotion.CreatedAt = model.CreatedAt;
                 promotion.StartAt = model.StartAt;
                 promotion.Subtitle = model.Subtitle;
                 promotion.Title = model.Title;
-                promotion.UpdatedAt = model.UpdatedAt;
+                promotion.UpdatedAt = DateTime.Now;
                 promotion.UsageLimit = model.UsageLimit;
-
                 promotionPlace.PlaceId = Convert.ToInt32(model.PlaceId);
 
                 _context.Promotions.Update(promotion);
