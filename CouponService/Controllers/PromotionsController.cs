@@ -33,7 +33,7 @@ namespace CouponService.Controllers
         }
 
         [HttpGet]
-        [Route("contents/{id=0}")]
+        [Route("promotions/contents/{id=0}")]
         public IActionResult GetPromotions(string id, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _promotionsRepository.GetPromotionsByAdvertisementsId(id, pageInfo);
