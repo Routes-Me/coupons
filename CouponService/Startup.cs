@@ -52,7 +52,6 @@ namespace CouponService
             
             services.AddScoped<ICouponsRepository, CouponsRepository>();
             services.AddScoped<IPlacesRepository, PlacesRepository>();
-            services.AddScoped<IAuthoritiesRepository, AuthoritiesRepository>();
             services.AddScoped<IPromotionsRepository, PromotionsRepository>();
             services.AddScoped<IIncludedRepository, IncludedRepository>();
             services.AddScoped<IRedemptionRepository, RedemptionRepository>();

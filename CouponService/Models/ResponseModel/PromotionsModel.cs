@@ -33,9 +33,7 @@ namespace CouponService.Models.ResponseModel
         public DateTime? UpdatedAt { get; set; }
         public DateTime? StartAt { get; set; }
         public DateTime? EndAt { get; set; }
-        public string QrCodeUrl { get; set; }
         public int? UsageLimit { get; set; }
-        public DateTime? ExpieryDate { get; set; }
         public string AdvertisementId { get; set; }
         public string InstitutionId { get; set; }
         public bool? IsSharable { get; set; }

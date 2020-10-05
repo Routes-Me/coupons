@@ -64,11 +64,9 @@ namespace CouponService.Repository
                                                AdvertisementId = promotion.AdvertisementId.ToString(),
                                                CreatedAt = promotion.CreatedAt,
                                                EndAt = promotion.EndAt,
-                                               ExpieryDate = promotion.ExpieryDate,
                                                InstitutionId = promotion.InstitutionId.ToString(),
                                                IsSharable = promotion.IsSharable,
                                                LogoUrl = promotion.LogoUrl,
-                                               QrCodeUrl = promotion.QrCodeUrl,
                                                StartAt = promotion.StartAt,
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
@@ -88,11 +86,9 @@ namespace CouponService.Repository
                                                AdvertisementId = promotion.AdvertisementId.ToString(),
                                                CreatedAt = promotion.CreatedAt,
                                                EndAt = promotion.EndAt,
-                                               ExpieryDate = promotion.ExpieryDate,
                                                InstitutionId = promotion.InstitutionId.ToString(),
                                                IsSharable = promotion.IsSharable,
                                                LogoUrl = promotion.LogoUrl,
-                                               QrCodeUrl = promotion.QrCodeUrl,
                                                StartAt = promotion.StartAt,
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
@@ -162,11 +158,9 @@ namespace CouponService.Repository
                                                AdvertisementId = promotion.AdvertisementId.ToString(),
                                                CreatedAt = promotion.CreatedAt,
                                                EndAt = promotion.EndAt,
-                                               ExpieryDate = promotion.ExpieryDate,
                                                InstitutionId = promotion.InstitutionId.ToString(),
                                                IsSharable = promotion.IsSharable,
                                                LogoUrl = promotion.LogoUrl,
-                                               QrCodeUrl = promotion.QrCodeUrl,
                                                StartAt = promotion.StartAt,
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
@@ -186,11 +180,9 @@ namespace CouponService.Repository
                                                AdvertisementId = promotion.AdvertisementId.ToString(),
                                                CreatedAt = promotion.CreatedAt,
                                                EndAt = promotion.EndAt,
-                                               ExpieryDate = promotion.ExpieryDate,
                                                InstitutionId = promotion.InstitutionId.ToString(),
                                                IsSharable = promotion.IsSharable,
                                                LogoUrl = promotion.LogoUrl,
-                                               QrCodeUrl = promotion.QrCodeUrl,
                                                StartAt = promotion.StartAt,
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
@@ -200,9 +192,6 @@ namespace CouponService.Repository
 
                     totalCount = _context.Promotions.Where(x => x.AdvertisementId == Convert.ToInt32(id)).ToList().Count();
                 }
-
-                if (promotionsModelList == null || promotionsModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.PromotionsNotFound, StatusCodes.Status404NotFound);
 
                 var page = new Pagination
                 {
@@ -239,12 +228,10 @@ namespace CouponService.Repository
                 {
                     AdvertisementId = Convert.ToInt32(model.AdvertisementId),
                     LogoUrl = model.LogoUrl,
-                    ExpieryDate = model.ExpieryDate,
                     EndAt = model.EndAt,
                     IsSharable = model.IsSharable,
                     InstitutionId = Convert.ToInt32(model.InstitutionId),
                     CreatedAt = DateTime.Now,
-                    QrCodeUrl = model.QrCodeUrl,
                     StartAt = model.StartAt,
                     Subtitle = model.Subtitle,
                     Title = model.Title,
@@ -288,12 +275,10 @@ namespace CouponService.Repository
 
                 promotion.AdvertisementId = Convert.ToInt32(model.AdvertisementId);
                 promotion.LogoUrl = model.LogoUrl;
-                promotion.ExpieryDate = model.ExpieryDate;
                 promotion.EndAt = model.EndAt;
                 promotion.IsSharable = model.IsSharable;
                 promotion.InstitutionId = Convert.ToInt32(model.InstitutionId);
                 promotion.CreatedAt = model.CreatedAt;
-                promotion.QrCodeUrl = model.QrCodeUrl;
                 promotion.StartAt = model.StartAt;
                 promotion.Subtitle = model.Subtitle;
                 promotion.Title = model.Title;

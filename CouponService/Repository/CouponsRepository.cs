@@ -87,7 +87,7 @@ namespace CouponService.Repository
                                               UserId = coupon.UserId.ToString()
                                           }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
+                        totalCount = _context.Coupons.Where(x=>x.CouponId == Convert.ToInt32(id)).ToList().Count();
                     }
                 }
                 else
@@ -104,7 +104,7 @@ namespace CouponService.Repository
                                               UserId = coupon.UserId.ToString()
                                           }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.ToList().Count();
+                        totalCount = _context.Coupons.Where(x => x.UserId == Convert.ToInt32(userId)).ToList().Count();
                     }
                     else
                     {
@@ -118,7 +118,7 @@ namespace CouponService.Repository
                                               UserId = coupon.UserId.ToString()
                                           }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
+                        totalCount = _context.Coupons.Where(x => x.CouponId == Convert.ToInt32(id) && x.UserId == Convert.ToInt32(userId)).ToList().Count();
                     }
                 }
                

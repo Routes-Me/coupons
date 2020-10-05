@@ -18,9 +18,7 @@ namespace CouponService.Models.DBModels
         public DateTime? UpdatedAt { get; set; }
         public DateTime? StartAt { get; set; }
         public DateTime? EndAt { get; set; }
-        public string QrCodeUrl { get; set; }
         public int? UsageLimit { get; set; }
-        public DateTime? ExpieryDate { get; set; }
         public int? AdvertisementId { get; set; }
         public int? InstitutionId { get; set; }
         public bool? IsSharable { get; set; }

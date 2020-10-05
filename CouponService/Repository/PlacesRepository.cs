@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static CouponService.Models.ReturnResponse;
 
 namespace CouponService.Repository
 {
@@ -61,7 +60,7 @@ namespace CouponService.Repository
                                           Name = place.Name
                                       }).OrderBy(a => a.PlaceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Authorities.ToList().Count();
+                    totalCount = _context.Places.ToList().Count();
                 }
                 else
                 {
@@ -75,7 +74,7 @@ namespace CouponService.Repository
                                            Name = place.Name
                                        }).OrderBy(a => a.PlaceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
+                    totalCount = _context.Places.Where(x => x.PlaceId == Convert.ToInt32(id)).ToList().Count();
                 }
 
 

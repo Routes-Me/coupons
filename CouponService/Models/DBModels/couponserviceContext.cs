@@ -15,7 +15,6 @@ namespace CouponService.Models.DBModels
         {
         }
 
-        public virtual DbSet<Authorities> Authorities { get; set; }
         public virtual DbSet<Coupons> Coupons { get; set; }
         public virtual DbSet<Places> Places { get; set; }
         public virtual DbSet<Promotions> Promotions { get; set; }
@@ -24,24 +23,6 @@ namespace CouponService.Models.DBModels
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Authorities>(entity =>
-            {
-                entity.HasKey(e => e.AuthorityId)
-                    .HasName("PRIMARY");
-
-                entity.ToTable("authorities");
-
-                entity.Property(e => e.AuthorityId).HasColumnName("authority_id");
-
-                entity.Property(e => e.InstitutionId).HasColumnName("institution_id");
-
-                entity.Property(e => e.Pin)
-                    .HasColumnName("pin")
-                    .HasColumnType("char(64)")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
-            });
-
             modelBuilder.Entity<Coupons>(entity =>
             {
                 entity.HasKey(e => e.CouponId)
@@ -111,10 +92,6 @@ namespace CouponService.Models.DBModels
                     .HasColumnName("end_at")
                     .HasColumnType("datetime");
 
-                entity.Property(e => e.ExpieryDate)
-                    .HasColumnName("expiery_date")
-                    .HasColumnType("date");
-
                 entity.Property(e => e.InstitutionId).HasColumnName("institution_id");
 
                 entity.Property(e => e.IsSharable).HasColumnName("is_sharable");
@@ -124,12 +101,6 @@ namespace CouponService.Models.DBModels
                     .HasColumnType("varchar(255)")
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
-
-                entity.Property(e => e.QrCodeUrl)
-                    .HasColumnName("qr_code_url")
-                    .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
 
                 entity.Property(e => e.StartAt)
                     .HasColumnName("start_at")
