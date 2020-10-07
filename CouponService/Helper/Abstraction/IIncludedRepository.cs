@@ -17,5 +17,6 @@ namespace CouponService.Helper.Abstraction
         dynamic GetOfficerData(string officerId);
         dynamic GetPinData(string institutionId);
         dynamic GetPromotionIncludedData(List<CouponsModel> placeModelList);
+        dynamic GetUserIncludedDataForRedemption(List<RedemptionGetModel> redemptionModelList);
     }
 }

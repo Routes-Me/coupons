@@ -131,13 +131,17 @@ namespace CouponService.Repository
                     {
                         foreach (var item in includeArr)
                         {
-                            if (item.ToLower() == "coupon")
+                            if (item.ToLower() == "coupon" || item.ToLower() == "coupons")
                             {
                                 includeData.coupons = _includedRepository.GetCouponIncludedData(redemptionModelList);
                             }
-                            else if (item.ToLower() == "officer")
+                            else if (item.ToLower() == "officer" || item.ToLower() == "officers")
                             {
-                                includeData.coupons = _includedRepository.GetOfficerIncludedData(redemptionModelList);
+                                includeData.officers = _includedRepository.GetOfficerIncludedData(redemptionModelList);
+                            }
+                            else if (item.ToLower() == "user" || item.ToLower() == "users")
+                            {
+                                includeData.users = _includedRepository.GetUserIncludedDataForRedemption(redemptionModelList);
                             }
                         }
                     }

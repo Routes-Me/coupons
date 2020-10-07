@@ -86,9 +86,7 @@ namespace CouponService.Helper.Repository
 
         public dynamic GetCouponIncludedData(List<RedemptionGetModel> redemptionModelList)
         {
-            List<CouponWithUser> lstCouponWithUser = new List<CouponWithUser>();
             List<Coupons> coupons = new List<Coupons>();
-            List<UserModel> lstUsers = new List<UserModel>();
             foreach (var item in redemptionModelList)
             {
                 var couponsDetails = (from coupon in _context.Coupons
@@ -104,24 +102,36 @@ namespace CouponService.Helper.Repository
                 coupons.Add(couponsDetails);
             }
             var couponsList = coupons.GroupBy(x => x.CouponId).Select(a => a.First()).ToList();
-            foreach (var item in couponsList)
+            return Common.SerializeJsonForIncludedRepo(couponsList.Cast<dynamic>().ToList());
+        }
+
+
+        public dynamic GetUserIncludedDataForRedemption(List<RedemptionGetModel> redemptionModelList)
+        {
+            List<string> users = new List<string>();
+            List<UserModel> userModel = new List<UserModel>();
+            foreach (var item in redemptionModelList)
             {
-                var client = new RestClient(_appSettings.Host + _dependencies.UserUrl + item.UserId);
+                var couponsDetails = _context.Coupons.Where(x => x.CouponId == Convert.ToInt32(item.CouponId)).FirstOrDefault();
+                if (couponsDetails != null)
+                {
+                    users.Add(Convert.ToString(couponsDetails.UserId));
+                }
+            }
+            foreach (var item in users)
+            {
+                var client = new RestClient(_appSettings.Host + _dependencies.UserUrl + item);
                 var request = new RestRequest(Method.GET);
                 IRestResponse response = client.Execute(request);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     var result = response.Content;
                     var userData = JsonConvert.DeserializeObject<UserData>(result);
-                    lstUsers.AddRange(userData.data);
+                    userModel.AddRange(userData.data);
                 }
             }
-            var usersList = lstUsers.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
-            CouponWithUser couponWithUser = new CouponWithUser();
-            couponWithUser.coupons = couponsList;
-            couponWithUser.users = usersList;
-            lstCouponWithUser.Add(couponWithUser);
-            return Common.SerializeJsonForIncludedRepo(lstCouponWithUser.Cast<dynamic>().ToList());
+            var usersList = userModel.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
+            return Common.SerializeJsonForIncludedRepo(usersList.Cast<dynamic>().ToList());
         }
 
         public dynamic GetPromotionIncludedData(List<CouponsModel> couponsModelList)
