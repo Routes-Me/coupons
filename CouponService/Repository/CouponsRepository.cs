@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using Obfuscation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,11 +32,12 @@ namespace CouponService.Repository
         {
             try
             {
-                var coupon = _context.Coupons.Include(x => x.Redemptions).Where(x => x.CouponId == Convert.ToInt32(id)).FirstOrDefault();
+                int couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                var coupon = _context.Coupons.Include(x => x.Redemptions).Where(x => x.CouponId == couponIdDecrypted).FirstOrDefault();
                 if (coupon == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.CouponsNotFound, StatusCodes.Status404NotFound);
 
-                var redemption = coupon.Redemptions.Where(x => x.CouponId == Convert.ToInt32(id)).FirstOrDefault();
+                var redemption = coupon.Redemptions.Where(x => x.CouponId == couponIdDecrypted).FirstOrDefault();
                 if (redemption != null)
                 {
                     _context.Redemptions.Remove(redemption);
@@ -58,67 +60,69 @@ namespace CouponService.Repository
             int totalCount = 0;
             try
             {
+                int couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(userId), _appSettings.PrimeInverse);
                 List<CouponsModel> placeModelList = new List<CouponsModel>();
 
-                if (Convert.ToInt32(userId) == 0)
+                if (userIdDecrypted == 0)
                 {
-                    if (Convert.ToInt32(id) == 0)
+                    if (couponIdDecrypted == 0)
                     {
                         placeModelList = (from coupon in _context.Coupons
                                           select new CouponsModel()
                                           {
-                                              CouponId = coupon.CouponId.ToString(),
-                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
                                               CreatedAt = coupon.CreatedAt,
-                                              UserId = coupon.UserId.ToString()
-                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                         totalCount = _context.Coupons.ToList().Count();
                     }
                     else
                     {
                         placeModelList = (from coupon in _context.Coupons
-                                          where coupon.CouponId == Convert.ToInt32(id)
+                                          where coupon.CouponId == couponIdDecrypted
                                           select new CouponsModel()
                                           {
-                                              CouponId = coupon.CouponId.ToString(),
-                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
                                               CreatedAt = coupon.CreatedAt,
-                                              UserId = coupon.UserId.ToString()
-                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.Where(x=>x.CouponId == Convert.ToInt32(id)).ToList().Count();
+                        totalCount = _context.Coupons.Where(x=>x.CouponId == couponIdDecrypted).ToList().Count();
                     }
                 }
                 else
                 {
-                    if (Convert.ToInt32(id) == 0)
+                    if (couponIdDecrypted == 0)
                     {
                         placeModelList = (from coupon in _context.Coupons
-                                          where coupon.UserId == Convert.ToInt32(userId)
+                                          where coupon.UserId == userIdDecrypted
                                           select new CouponsModel()
                                           {
-                                              CouponId = coupon.CouponId.ToString(),
-                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
                                               CreatedAt = coupon.CreatedAt,
-                                              UserId = coupon.UserId.ToString()
-                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.Where(x => x.UserId == Convert.ToInt32(userId)).ToList().Count();
+                        totalCount = _context.Coupons.Where(x => x.UserId == userIdDecrypted).ToList().Count();
                     }
                     else
                     {
                         placeModelList = (from coupon in _context.Coupons
-                                          where coupon.CouponId == Convert.ToInt32(id) && coupon.UserId == Convert.ToInt32(userId)
+                                          where coupon.CouponId == couponIdDecrypted && coupon.UserId == userIdDecrypted
                                           select new CouponsModel()
                                           {
-                                              CouponId = coupon.CouponId.ToString(),
-                                              PromotionId = coupon.PromotionId.ToString(),
+                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
                                               CreatedAt = coupon.CreatedAt,
-                                              UserId = coupon.UserId.ToString()
-                                          }).OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.Where(x => x.CouponId == Convert.ToInt32(id) && x.UserId == Convert.ToInt32(userId)).ToList().Count();
+                        totalCount = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted && x.UserId == userIdDecrypted).ToList().Count();
                     }
                 }
                
@@ -170,17 +174,19 @@ namespace CouponService.Repository
         {
             try
             {
+                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PromotionId), _appSettings.PrimeInverse);
+                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.UserId), _appSettings.PrimeInverse);
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var promotion = _context.Promotions.Include(x => x.Coupons).Where(x => x.PromotionId == Convert.ToInt32(model.PromotionId)).FirstOrDefault();
+                var promotion = _context.Promotions.Include(x => x.Coupons).Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.PromotionsNotFound, StatusCodes.Status404NotFound);
 
                 if (promotion.Coupons.Count >= promotion.UsageLimit)
                     return ReturnResponse.ErrorResponse(CommonMessage.PromotionsUsageLimitExceed, StatusCodes.Status422UnprocessableEntity);
 
-                var user = promotion.Coupons.Where(x => x.UserId == Convert.ToInt32(model.UserId)).OrderByDescending(x => x.CouponId).FirstOrDefault();
+                var user = promotion.Coupons.Where(x => x.UserId == userIdDecrypted).OrderByDescending(x => x.CouponId).FirstOrDefault();
                 if (user != null)
                 {
                     if (user.CreatedAt >= DateTime.Now.AddHours(-14))
@@ -190,8 +196,8 @@ namespace CouponService.Repository
                 Coupons coupon = new Coupons()
                 {
                     CreatedAt = DateTime.Now,
-                    PromotionId = Convert.ToInt32(model.PromotionId),
-                    UserId = Convert.ToInt32(model.UserId)
+                    PromotionId = promotionIdDecrypted,
+                    UserId = userIdDecrypted
                 };
                 _context.Coupons.Add(coupon);
                 _context.SaveChanges();

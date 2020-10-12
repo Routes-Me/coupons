@@ -6,6 +6,7 @@ using CouponService.Models.ResponseModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Obfuscation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,8 @@ namespace CouponService.Repository
         {
             try
             {
-                var place = _context.Places.Include(x => x.PromotionsPlaces).Where(x => x.PlaceId == Convert.ToInt32(id)).FirstOrDefault();
+                int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                var place = _context.Places.Include(x => x.PromotionsPlaces).Where(x => x.PlaceId == placeIdDecrypted).FirstOrDefault();
                 if (place == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.PlacesNotFound, StatusCodes.Status404NotFound);
 
@@ -47,34 +49,35 @@ namespace CouponService.Repository
             PlacesGetResponse response = new PlacesGetResponse();
             int totalCount = 0;
             try
-            {                
+            {
+                int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
                 List<PlacesModel> placeModelList = new List<PlacesModel>();
-                if (Convert.ToInt32(id) == 0)
+                if (placeIdDecrypted == 0)
                 {
                     placeModelList = (from place in _context.Places
                                       select new PlacesModel()
                                       {
-                                          PlaceId = place.PlaceId.ToString(),
+                                          PlaceId = ObfuscationClass.EncodeId(place.PlaceId, _appSettings.Prime).ToString(),
                                           Latitude = place.Latitude,
                                           Longitude = place.Longitude,
                                           Name = place.Name
-                                      }).OrderBy(a => a.PlaceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                      }).AsEnumerable().OrderBy(a => a.PlaceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Places.ToList().Count();
                 }
                 else
                 {
                     placeModelList = (from place in _context.Places
-                                      where place.PlaceId == Convert.ToInt32(id)
-                                       select new PlacesModel()
-                                       {
-                                           PlaceId = place.PlaceId.ToString(),
-                                           Latitude = place.Latitude,
-                                           Longitude = place.Longitude,
-                                           Name = place.Name
-                                       }).OrderBy(a => a.PlaceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                      where place.PlaceId == placeIdDecrypted
+                                      select new PlacesModel()
+                                      {
+                                          PlaceId = ObfuscationClass.EncodeId(place.PlaceId, _appSettings.Prime).ToString(),
+                                          Latitude = place.Latitude,
+                                          Longitude = place.Longitude,
+                                          Name = place.Name
+                                      }).AsEnumerable().OrderBy(a => a.PlaceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Places.Where(x => x.PlaceId == Convert.ToInt32(id)).ToList().Count();
+                    totalCount = _context.Places.Where(x => x.PlaceId == placeIdDecrypted).ToList().Count();
                 }
 
 
@@ -125,10 +128,11 @@ namespace CouponService.Repository
         {
             try
             {
+                int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var places = _context.Places.Where(x => x.PlaceId == Convert.ToInt32(model.PlaceId)).FirstOrDefault();
+                var places = _context.Places.Where(x => x.PlaceId == placeIdDecrypted).FirstOrDefault();
                 if (places == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.AuthoritiesNotFound, StatusCodes.Status404NotFound);
 

@@ -17,5 +17,6 @@ namespace CouponService.Models.ResponseModel
         public string CouponId { get; set; }
         public string OfficerId { get; set; }
         public string Pin { get; set; }
+        public string InstitutionId { get; set; }
     }
 }

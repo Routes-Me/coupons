@@ -14,6 +14,8 @@ namespace CouponService.Helper.Model
         public string KEY { get; set; }
         public string RedeedInterval { get; set; }
         public string Host { get; set; }
+        public int Prime { get; set; }
+        public int PrimeInverse { get; set; }
     }
 }
     

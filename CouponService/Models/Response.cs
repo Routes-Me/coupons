@@ -48,16 +48,6 @@ namespace CouponService.Models
         }
     }
 
-    #region Authorities Reponse
-    public class AuthoritiesGetResponse : Response
-    {
-        public Pagination pagination { get; set; }
-        public List<AuthoritiesModel> data { get; set; }
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public JObject included { get; set; }
-    }
-    #endregion
-
     #region Redemption Reponse
     public class RedemptionGetResponse : Response
     {

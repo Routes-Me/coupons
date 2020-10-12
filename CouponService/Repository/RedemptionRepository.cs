@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Obfuscation;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,8 @@ namespace CouponService.Repository
         {
             try
             {
-                var redemption = _context.Redemptions.Include(x => x.Coupon).Where(x => x.RedemptionId == Convert.ToInt32(id)).FirstOrDefault();
+                int redemptionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                var redemption = _context.Redemptions.Include(x => x.Coupon).Where(x => x.RedemptionId == redemptionIdDecrypted).FirstOrDefault();
                 if (redemption == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.RedemptionNotFound, StatusCodes.Status404NotFound);
 
@@ -58,71 +60,72 @@ namespace CouponService.Repository
             int totalCount = 0;
             try
             {
+                int redemptionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
                 List<RedemptionGetModel> redemptionModelList = new List<RedemptionGetModel>();
 
-                if (Convert.ToInt32(officerId) == 0)
+                if (officerIdDecrypted == 0)
                 {
-                    if (Convert.ToInt32(id) == 0)
+                    if (redemptionIdDecrypted == 0)
                     {
                         redemptionModelList = (from redemption in _context.Redemptions
                                                select new RedemptionGetModel()
                                                {
-                                                   RedemptionId = redemption.RedemptionId.ToString(),
-                                                   CouponId = redemption.CouponId.ToString(),
-                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   RedemptionId = ObfuscationClass.EncodeId(redemption.RedemptionId, _appSettings.Prime).ToString(),
+                                                   CouponId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.CouponId), _appSettings.Prime).ToString(),
+                                                   OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.OfficerId), _appSettings.Prime).ToString(),
                                                    CreatedAt = redemption.CreatedAt
-                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                               }).AsEnumerable().OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                         totalCount = _context.Redemptions.ToList().Count();
                     }
                     else
                     {
                         redemptionModelList = (from redemption in _context.Redemptions
-                                               where redemption.RedemptionId == Convert.ToInt32(id)
+                                               where redemption.RedemptionId == redemptionIdDecrypted
                                                select new RedemptionGetModel()
                                                {
-                                                   RedemptionId = redemption.RedemptionId.ToString(),
-                                                   CouponId = redemption.CouponId.ToString(),
-                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   RedemptionId = ObfuscationClass.EncodeId(redemption.RedemptionId, _appSettings.Prime).ToString(),
+                                                   CouponId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.CouponId), _appSettings.Prime).ToString(),
+                                                   OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.OfficerId), _appSettings.Prime).ToString(),
                                                    CreatedAt = redemption.CreatedAt
-                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                               }).AsEnumerable().OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Redemptions.Where(x => x.RedemptionId == Convert.ToInt32(id)).ToList().Count();
+                        totalCount = _context.Redemptions.Where(x => x.RedemptionId == redemptionIdDecrypted).ToList().Count();
                     }
                 }
                 else
                 {
-                    if (Convert.ToInt32(id) == 0)
+                    if (redemptionIdDecrypted == 0)
                     {
                         redemptionModelList = (from redemption in _context.Redemptions
-                                               where redemption.OfficerId == Convert.ToInt32(officerId)
+                                               where redemption.OfficerId == officerIdDecrypted
                                                select new RedemptionGetModel()
                                                {
-                                                   RedemptionId = redemption.RedemptionId.ToString(),
-                                                   CouponId = redemption.CouponId.ToString(),
-                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   RedemptionId = ObfuscationClass.EncodeId(redemption.RedemptionId, _appSettings.Prime).ToString(),
+                                                   CouponId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.CouponId), _appSettings.Prime).ToString(),
+                                                   OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.OfficerId), _appSettings.Prime).ToString(),
                                                    CreatedAt = redemption.CreatedAt
-                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                               }).AsEnumerable().OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Redemptions.Where(x => x.OfficerId == Convert.ToInt32(officerId)).ToList().Count();
+                        totalCount = _context.Redemptions.Where(x => x.OfficerId == officerIdDecrypted).ToList().Count();
                     }
                     else
                     {
                         redemptionModelList = (from redemption in _context.Redemptions
-                                               where redemption.RedemptionId == Convert.ToInt32(id) && redemption.OfficerId == Convert.ToInt32(officerId)
+                                               where redemption.RedemptionId == redemptionIdDecrypted && redemption.OfficerId == officerIdDecrypted
                                                select new RedemptionGetModel()
                                                {
-                                                   RedemptionId = redemption.RedemptionId.ToString(),
-                                                   CouponId = redemption.CouponId.ToString(),
-                                                   OfficerId = redemption.OfficerId.ToString(),
+                                                   RedemptionId = ObfuscationClass.EncodeId(redemption.RedemptionId, _appSettings.Prime).ToString(),
+                                                   CouponId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.CouponId), _appSettings.Prime).ToString(),
+                                                   OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(redemption.OfficerId), _appSettings.Prime).ToString(),
                                                    CreatedAt = redemption.CreatedAt
-                                               }).OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                               }).AsEnumerable().OrderBy(a => a.RedemptionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Redemptions.Where(x => x.RedemptionId == Convert.ToInt32(id) && x.OfficerId == Convert.ToInt32(officerId)).ToList().Count();
+                        totalCount = _context.Redemptions.Where(x => x.RedemptionId == redemptionIdDecrypted && x.OfficerId == officerIdDecrypted).ToList().Count();
                     }
                 }
 
-               
                 dynamic includeData = new JObject();
                 if (!string.IsNullOrEmpty(includedType))
                 {
@@ -175,10 +178,13 @@ namespace CouponService.Repository
         {
             try
             {
+                if (model.OfficerId == "") model.OfficerId = "0";
+                int couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.CouponId), _appSettings.PrimeInverse);
+                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.OfficerId), _appSettings.PrimeInverse);
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var coupon = _context.Coupons.Include(x => x.Promotion).Include(x => x.Redemptions).Where(x => x.CouponId == Convert.ToInt32(model.CouponId)).FirstOrDefault();
+                var coupon = _context.Coupons.Include(x => x.Promotion).Include(x => x.Redemptions).Where(x => x.CouponId == couponIdDecrypted).FirstOrDefault();
                 if (coupon == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.CouponsNotFound, StatusCodes.Status404NotFound);
 
@@ -190,7 +196,7 @@ namespace CouponService.Repository
                 }
 
                 List<AuthoritiesModel> authorities = new List<AuthoritiesModel>();
-                authorities = _includedRepository.GetPinData(model.OfficerId);
+                authorities = _includedRepository.GetPinData(model.InstitutionId);
                 if (authorities == null || authorities.Count() == 0)
                     return ReturnResponse.ErrorResponse(CommonMessage.AuthoritiesNotFound, StatusCodes.Status404NotFound);
 
@@ -208,16 +214,17 @@ namespace CouponService.Repository
                 if (officers == null || officers.Count() == 0)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
-                if (coupon.Promotion.InstitutionId != Convert.ToInt32(officers.FirstOrDefault().InstitutionId))
+                int InstitutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officers.FirstOrDefault().InstitutionId), _appSettings.PrimeInverse);
+                if (coupon.Promotion.InstitutionId != InstitutionIdDecrypted)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerDoNotBelong, StatusCodes.Status400BadRequest);
 
-             
+
 
                 Redemptions redemption = new Redemptions()
                 {
                     CreatedAt = DateTime.Now,
-                    CouponId = Convert.ToInt32(model.CouponId),
-                    OfficerId = Convert.ToInt32(model.OfficerId)
+                    CouponId = couponIdDecrypted,
+                    OfficerId = officerIdDecrypted
                 };
                 _context.Redemptions.Add(redemption);
                 _context.SaveChanges();
@@ -225,7 +232,7 @@ namespace CouponService.Repository
                 response.status = true;
                 response.message = CommonMessage.RedemptionInsert;
                 response.statusCode = StatusCodes.Status201Created;
-                response.RedemptionId = Convert.ToString(redemption.RedemptionId);
+                response.RedemptionId = ObfuscationClass.EncodeId(redemption.RedemptionId, _appSettings.Prime).ToString();
                 return response;
             }
             catch (Exception ex)
