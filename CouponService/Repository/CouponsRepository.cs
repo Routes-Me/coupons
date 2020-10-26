@@ -180,17 +180,20 @@ namespace CouponService.Repository
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
                 var promotion = _context.Promotions.Include(x => x.Coupons).Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
-                if (model == null)
+                if (promotion == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.PromotionsNotFound, StatusCodes.Status404NotFound);
 
                 if (promotion.Coupons.Count >= promotion.UsageLimit)
                     return ReturnResponse.ErrorResponse(CommonMessage.PromotionsUsageLimitExceed, StatusCodes.Status422UnprocessableEntity);
 
-                var user = promotion.Coupons.Where(x => x.UserId == userIdDecrypted).OrderByDescending(x => x.CouponId).FirstOrDefault();
-                if (user != null)
+                var couponData = promotion.Coupons.Where(x => x.UserId == userIdDecrypted).OrderByDescending(x => x.CouponId).FirstOrDefault();
+                if (couponData != null)
                 {
-                    if (user.CreatedAt >= DateTime.Now.AddHours(-14))
-                        return ReturnResponse.ErrorResponse(CommonMessage.CouponsRedeemed, StatusCodes.Status400BadRequest);
+                    if (Convert.ToDateTime(couponData.CreatedAt).AddHours(14) >= DateTime.Now)
+                    {
+                        TimeSpan remainHour = Convert.ToDateTime(Convert.ToDateTime(couponData.CreatedAt).AddHours(14)) - DateTime.Now;
+                        return ReturnResponse.ErrorResponse("Coupons already redeemed. You can try again after "+ Convert.ToDecimal(remainHour.TotalHours).ToString("#.##") + " hours.", StatusCodes.Status400BadRequest);
+                    }
                 }
 
                 Coupons coupon = new Coupons()
