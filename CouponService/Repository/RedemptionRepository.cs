@@ -190,9 +190,12 @@ namespace CouponService.Repository
 
                 if (coupon.Redemptions.Count() > 0)
                 {
-                    var timeDifference = (coupon.Redemptions.OrderByDescending(x => x.CreatedAt).FirstOrDefault().CreatedAt - DateTime.Now.AddHours(-14));
-                    if (timeDifference.Value.TotalMinutes > 0)
-                        return ReturnResponse.ErrorResponse(CommonMessage.CouponsRedeemed, StatusCodes.Status400BadRequest);
+                    var lastRedemptionDate = coupon.Redemptions.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+                    if (Convert.ToDateTime(coupon.CreatedAt).AddHours(14) >= DateTime.Now)
+                    {
+                        TimeSpan remainHour = Convert.ToDateTime(Convert.ToDateTime(lastRedemptionDate.CreatedAt).AddHours(14)) - DateTime.Now;
+                        return ReturnResponse.ErrorResponse("Coupons already redeemed. You can try again after " + Convert.ToDecimal(remainHour.TotalHours).ToString("#.##") + " hours.", StatusCodes.Status400BadRequest);
+                    }
                 }
 
                 List<AuthoritiesModel> authorities = new List<AuthoritiesModel>();
@@ -213,6 +216,8 @@ namespace CouponService.Repository
                 officers = _includedRepository.GetOfficerData(model.OfficerId);
                 if (officers == null || officers.Count() == 0)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
+
+                int InstitutionIdDecrypted1 = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
 
                 int InstitutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officers.FirstOrDefault().InstitutionId), _appSettings.PrimeInverse);
                 if (coupon.Promotion.InstitutionId != InstitutionIdDecrypted)
