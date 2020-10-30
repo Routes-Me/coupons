@@ -5,6 +5,7 @@ using CouponService.Models.DBModels;
 using CouponService.Models.ResponseModel;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Obfuscation;
 using RestSharp;
 using System;
@@ -234,6 +235,33 @@ namespace CouponService.Helper.Repository
                 lstAuthorities.AddRange(authoritiesData.data);
             }
             return lstAuthorities;
+        }
+
+        public dynamic GetSearchCouponIncludedData(List<RedemptionGetModel> redemptionModelList, string search)
+        {
+            List<Coupons> coupons = new List<Coupons>();
+            foreach (var item in redemptionModelList)
+            {
+                var couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.CouponId), _appSettings.PrimeInverse);
+                var couponsDetails = (from coupon in _context.Coupons
+                                      where coupon.CouponId == couponIdDecrypted
+                                      select new Coupons()
+                                      {
+                                          CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime),
+                                          PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime),
+                                          UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime),
+                                          CreatedAt = coupon.CreatedAt,
+                                          Promotion = coupon.Promotion
+                                      }).AsEnumerable().FirstOrDefault();
+                coupons.Add(couponsDetails);
+            }
+            foreach (var item in coupons)
+            {
+                item.Promotion.Coupons = null;
+                item.Promotion.PromotionsPlaces = null;
+            }
+            var couponsList = coupons.GroupBy(x => x.CouponId).Select(a => a.First()).ToList();
+            return Common.SerializeJsonForIncludedRepo(couponsList.Cast<dynamic>().ToList());
         }
     }
 }

@@ -245,5 +245,91 @@ namespace CouponService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
+
+        public dynamic SearchRedemption(string officerId, string q, Pagination pageInfo, string includedType)
+        {
+            RedemptionGetResponse response = new RedemptionGetResponse();
+            int totalCount = 0;
+            try
+            {
+                List<RedemptionGetModel> redemptionModelList = new List<RedemptionGetModel>();
+                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
+                //int redemptionIdDecrypted = 0;
+                //try
+                //{
+                //    redemptionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(q), _appSettings.PrimeInverse);
+                //}
+                //catch (Exception)
+                //{
+                //    redemptionIdDecrypted = 0;
+                //}
+                
+                //if (redemptionIdDecrypted == 0)
+                //{
+                    var redemptionsData = _context.Redemptions.Include(x => x.Coupon).Where(x => x.OfficerId == officerIdDecrypted && x.Coupon.Promotion.Title.Contains(q)).ToList();
+                    redemptionModelList = GetRedemptionDetails(redemptionsData);
+                    totalCount = _context.Redemptions.Where(x => x.OfficerId == officerIdDecrypted && x.Coupon.Promotion.Title.Contains(q)).ToList().Count();
+                //}
+                //else
+                //{
+                //    var redemptionsData = _context.Redemptions.Include(x => x.Coupon).Where(x => x.RedemptionId == redemptionIdDecrypted || x.OfficerId == officerIdDecrypted ).ToList();
+                //    redemptionModelList = GetRedemptionDetails(redemptionsData);
+                //    totalCount = _context.Redemptions.Where(x => x.RedemptionId == redemptionIdDecrypted || x.OfficerId == officerIdDecrypted).ToList().Count();
+                //}
+
+                dynamic includeData = new JObject();
+                if (!string.IsNullOrEmpty(includedType))
+                {
+                    string[] includeArr = includedType.Split(',');
+                    if (includeArr.Length > 0)
+                    {
+                        foreach (var item in includeArr)
+                        {
+                            if (item.ToLower() == "coupon" || item.ToLower() == "coupons")
+                            {
+                                includeData.coupons = _includedRepository.GetSearchCouponIncludedData(redemptionModelList, q);
+                            }
+                        }
+                    }
+                }
+
+                if (((JContainer)includeData).Count == 0)
+                    includeData = null;
+
+                var page = new Pagination
+                {
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
+                    total = totalCount
+                };
+
+                response.status = true;
+                response.message = CommonMessage.AuthoritiesRetrived;
+                response.pagination = page;
+                response.data = redemptionModelList;
+                response.included = includeData;
+                response.statusCode = StatusCodes.Status200OK;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return ReturnResponse.ExceptionResponse(ex);
+            }
+        }
+
+        private List<RedemptionGetModel> GetRedemptionDetails(List<Redemptions> redemptionsData)
+        {
+            List<RedemptionGetModel> modelList = new List<RedemptionGetModel>();
+            foreach (var item in redemptionsData)
+            {
+                RedemptionGetModel model = new RedemptionGetModel();
+                model.RedemptionId = ObfuscationClass.EncodeId(item.RedemptionId, _appSettings.Prime).ToString();
+                model.CouponId = ObfuscationClass.EncodeId(Convert.ToInt32(item.CouponId), _appSettings.Prime).ToString();
+                model.OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(item.OfficerId), _appSettings.Prime).ToString();
+                model.CreatedAt = item.CreatedAt;
+                modelList.Add(model);
+            }
+            return modelList;
+        }
     }
 }

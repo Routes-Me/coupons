@@ -39,5 +39,14 @@ namespace CouponService.Controllers
             dynamic response = _redemptionRepository.DeleteRedemption(id);
             return StatusCode((int)response.statusCode, response);
         }
+
+
+        [HttpGet]
+        [Route("coupons/redeem/search")]
+        public IActionResult GetSearchRedemption(string officerId, string q, string cxt, string Include, [FromQuery] Pagination pageInfo)
+        {
+            dynamic response = _redemptionRepository.SearchRedemption(officerId, q, pageInfo, Include);
+            return StatusCode((int)response.statusCode, response);
+        }
     }
 }

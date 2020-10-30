@@ -192,7 +192,7 @@ namespace CouponService.Repository
                     if (Convert.ToDateTime(couponData.CreatedAt).AddHours(14) >= DateTime.Now)
                     {
                         TimeSpan remainHour = Convert.ToDateTime(Convert.ToDateTime(couponData.CreatedAt).AddHours(14)) - DateTime.Now;
-                        return ReturnResponse.ErrorResponse("Coupons already generated. You can try again after "+ Convert.ToDecimal(remainHour.TotalHours).ToString("#.##") + " hours.", StatusCodes.Status400BadRequest);
+                        return ReturnResponse.ErrorResponse("Coupons already generated for this promotion. You can try again after "+ Convert.ToDecimal(remainHour.TotalHours).ToString("#.##") + " hours.", StatusCodes.Status400BadRequest);
                     }
                 }
 

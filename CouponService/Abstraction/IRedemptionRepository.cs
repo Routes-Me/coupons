@@ -8,5 +8,6 @@ namespace CouponService.Abstraction
         dynamic GetRedemption(string id, string officerId, Pagination pageInfo, string includedType);
         dynamic DeleteRedemption(string id);
         dynamic InsertRedemption(RedemptionModel model);
+        dynamic SearchRedemption(string officerId, string q, Pagination pageInfo, string includedType);
     }
 }
