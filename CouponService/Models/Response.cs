@@ -21,8 +21,8 @@ namespace CouponService.Models
         {
             Response response = new Response();
             response.status = false;
-            response.message = CommonMessage.GenericException;
-            response.statusCode = StatusCodes.Status401Unauthorized;
+            response.message = CommonMessage.ExceptionMessage;
+            response.statusCode = StatusCodes.Status500InternalServerError;
             return response;
         }
 

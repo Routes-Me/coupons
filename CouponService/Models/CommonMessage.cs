@@ -38,6 +38,5 @@
         public static string OfficerDoNotBelong = "Officer does not belong to this institution.";
         public static string OfficerNotFound = "Officer not found.";
         public static string ExceptionMessage = "Something went wrong. Error Message - ";
-        public static string GenericException = "You are not authorized to access this content.";
     }
 }
