@@ -222,13 +222,17 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
+                int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
+                int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
+
                 Promotions promotion = new Promotions()
                 {
-                    AdvertisementId = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse),
+                    AdvertisementId = advertisementIdDecrypted,
                     LogoUrl = model.LogoUrl,
                     EndAt = model.EndAt,
                     IsSharable = model.IsSharable,
-                    InstitutionId = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse),
+                    InstitutionId = institutionIdDecrypted,
                     CreatedAt = DateTime.Now,
                     StartAt = model.StartAt,
                     Subtitle = model.Subtitle,
@@ -241,7 +245,7 @@ namespace CouponService.Repository
                 PromotionsPlaces promotionsPlace = new PromotionsPlaces()
                 {
                     PromotionId = promotion.PromotionId,
-                    PlaceId = Convert.ToInt32(model.PlaceId)
+                    PlaceId = placeIdDecrypted
                 };
                 _context.PromotionsPlaces.Add(promotionsPlace);
                 _context.SaveChanges();
