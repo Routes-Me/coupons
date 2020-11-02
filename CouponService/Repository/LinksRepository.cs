@@ -49,42 +49,81 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetLinks(string id, Pagination pageInfo, string includeType)
+        public dynamic GetLinks(string id, string promotionId, Pagination pageInfo, string includeType)
         {
             LinkResponse response = new LinkResponse();
             int totalCount = 0;
             try
             {
                 int linkIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(promotionId), _appSettings.PrimeInverse);
                 List<LinksModel> linkModelList = new List<LinksModel>();
                 if (linkIdDecrypted == 0)
                 {
-                    linkModelList = (from link in _context.Links
-                                     select new LinksModel()
-                                     {
-                                         LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
-                                         PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
-                                         Web = link.Web,
-                                         Ios = link.Ios,
-                                         Android = link.Android
-                                     }).AsEnumerable().OrderBy(a => a.LinkId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (promotionIdDecrypted == 0)
+                    {
+                        linkModelList = (from link in _context.Links
+                                         select new LinksModel()
+                                         {
+                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
+                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             Web = link.Web,
+                                             Ios = link.Ios,
+                                             Android = link.Android
+                                         }).AsEnumerable().OrderBy(a => a.LinkId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Links.ToList().Count();
+                        totalCount = _context.Links.ToList().Count();
+                    }
+                    else
+                    {
+                        linkModelList = (from link in _context.Links
+                                         where link.PromotionId == promotionIdDecrypted
+                                         select new LinksModel()
+                                         {
+                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
+                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             Web = link.Web,
+                                             Ios = link.Ios,
+                                             Android = link.Android
+                                         }).AsEnumerable().OrderBy(a => a.LinkId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Links.Where(x => x.PromotionId == promotionIdDecrypted).ToList().Count();
+
+                    }
+
                 }
                 else
                 {
-                    linkModelList = (from link in _context.Links
-                                     where link.LinkId == linkIdDecrypted
-                                     select new LinksModel()
-                                     {
-                                         LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
-                                         PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
-                                         Web = link.Web,
-                                         Ios = link.Ios,
-                                         Android = link.Android
-                                     }).AsEnumerable().OrderBy(a => a.LinkId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (promotionIdDecrypted == 0)
+                    {
+                        linkModelList = (from link in _context.Links
+                                         where link.LinkId == linkIdDecrypted
+                                         select new LinksModel()
+                                         {
+                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
+                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             Web = link.Web,
+                                             Ios = link.Ios,
+                                             Android = link.Android
+                                         }).AsEnumerable().OrderBy(a => a.LinkId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Links.Where(x => x.LinkId == linkIdDecrypted).ToList().Count();
+                        totalCount = _context.Links.Where(x => x.LinkId == linkIdDecrypted).ToList().Count();
+                    }
+                    else
+                    {
+                        linkModelList = (from link in _context.Links
+                                         where link.LinkId == linkIdDecrypted && link.PromotionId == promotionIdDecrypted
+                                         select new LinksModel()
+                                         {
+                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
+                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             Web = link.Web,
+                                             Ios = link.Ios,
+                                             Android = link.Android
+                                         }).AsEnumerable().OrderBy(a => a.LinkId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Links.Where(x => x.LinkId == linkIdDecrypted && x.PromotionId == promotionIdDecrypted).ToList().Count();
+                    }
                 }
 
                 var page = new Pagination
