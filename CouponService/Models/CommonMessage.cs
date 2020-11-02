@@ -38,5 +38,12 @@
         public static string OfficerDoNotBelong = "Officer does not belong to this institution.";
         public static string OfficerNotFound = "Officer not found.";
         public static string ExceptionMessage = "Something went wrong. Error Message - ";
+
+        public static string LinksRetrived = "Links Retrived successfully.";
+        public static string LinksNotFound = "Links not found.";
+        public static string LinksDelete = "Links deleted successfully.";
+        public static string LinksInsert = "Links inserted successfully.";
+        public static string LinksUpdate = "Links updated successfully.";
+        public static string LinksConflict = "Links are associated with promotions.";
     }
 }

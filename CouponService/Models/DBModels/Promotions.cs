@@ -8,6 +8,7 @@ namespace CouponService.Models.DBModels
         public Promotions()
         {
             Coupons = new HashSet<Coupons>();
+            Links = new HashSet<Links>();
             PromotionsPlaces = new HashSet<PromotionsPlaces>();
         }
 
@@ -23,8 +24,10 @@ namespace CouponService.Models.DBModels
         public int? InstitutionId { get; set; }
         public bool? IsSharable { get; set; }
         public string LogoUrl { get; set; }
+        public string Type { get; set; }
 
         public virtual ICollection<Coupons> Coupons { get; set; }
+        public virtual ICollection<Links> Links { get; set; }
         public virtual ICollection<PromotionsPlaces> PromotionsPlaces { get; set; }
     }
 }

@@ -55,6 +55,7 @@ namespace CouponService
             services.AddScoped<IPromotionsRepository, PromotionsRepository>();
             services.AddScoped<IIncludedRepository, IncludedRepository>();
             services.AddScoped<IRedemptionRepository, RedemptionRepository>();
+            services.AddScoped<ILinksRepository, LinksRepository>();
 
             services.Configure<AzureStorageBlobConfig>(Configuration.GetSection("AzureStorageBlobConfig"));
             services.Configure<Dependencies>(Configuration.GetSection("Dependencies"));

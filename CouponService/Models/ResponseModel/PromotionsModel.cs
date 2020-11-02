@@ -22,6 +22,7 @@ namespace CouponService.Models.ResponseModel
         public string InstitutionId { get; set; }
         public bool? IsSharable { get; set; }
         public string LogoUrl { get; set; }
+        public string Type { get; set; }
     }
 
     public class PromotionsModel
@@ -38,5 +39,6 @@ namespace CouponService.Models.ResponseModel
         public string InstitutionId { get; set; }
         public bool? IsSharable { get; set; }
         public string LogoUrl { get; set; }
+        public string Type { get; set; }
     }
 }

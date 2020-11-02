@@ -16,10 +16,20 @@ namespace CouponService.Models.DBModels
         }
 
         public virtual DbSet<Coupons> Coupons { get; set; }
+        public virtual DbSet<Links> Links { get; set; }
         public virtual DbSet<Places> Places { get; set; }
         public virtual DbSet<Promotions> Promotions { get; set; }
         public virtual DbSet<PromotionsPlaces> PromotionsPlaces { get; set; }
         public virtual DbSet<Redemptions> Redemptions { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseMySql("server=localhost;port=3306;user=nirmal;password=NirmalTheOne@123;database=couponservice", x => x.ServerVersion("8.0.20-mysql"));
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +57,44 @@ namespace CouponService.Models.DBModels
                     .WithMany(p => p.Coupons)
                     .HasForeignKey(d => d.PromotionId)
                     .HasConstraintName("coupons_ibfk_1");
+            });
+
+            modelBuilder.Entity<Links>(entity =>
+            {
+                entity.HasKey(e => e.LinkId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("links");
+
+                entity.HasIndex(e => e.PromotionId)
+                    .HasName("promotion_id");
+
+                entity.Property(e => e.LinkId).HasColumnName("link_id");
+
+                entity.Property(e => e.Android)
+                    .HasColumnName("android")
+                    .HasColumnType("varchar(255)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.Property(e => e.Ios)
+                    .HasColumnName("ios")
+                    .HasColumnType("varchar(255)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.Property(e => e.PromotionId).HasColumnName("promotion_id");
+
+                entity.Property(e => e.Web)
+                    .HasColumnName("web")
+                    .HasColumnType("varchar(255)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.HasOne(d => d.Promotion)
+                    .WithMany(p => p.Links)
+                    .HasForeignKey(d => d.PromotionId)
+                    .HasConstraintName("links_ibfk_1");
             });
 
             modelBuilder.Entity<Places>(entity =>
@@ -117,6 +165,12 @@ namespace CouponService.Models.DBModels
                     .HasColumnType("varchar(100)")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasColumnType("enum('places','links','coupons')")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")

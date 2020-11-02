@@ -72,7 +72,8 @@ namespace CouponService.Repository
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
-                                               UsageLimit = promotion.UsageLimit
+                                               UsageLimit = promotion.UsageLimit,
+                                               Type = promotion.Type
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.ToList().Count();
@@ -94,7 +95,8 @@ namespace CouponService.Repository
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
-                                               UsageLimit = promotion.UsageLimit
+                                               UsageLimit = promotion.UsageLimit,
+                                               Type = promotion.Type
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.Where(x => x.PromotionId == promotionIdDecrypted).ToList().Count();
@@ -167,7 +169,8 @@ namespace CouponService.Repository
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
-                                               UsageLimit = promotion.UsageLimit
+                                               UsageLimit = promotion.UsageLimit,
+                                               Type = promotion.Type
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.ToList().Count();
@@ -189,7 +192,8 @@ namespace CouponService.Repository
                                                Subtitle = promotion.Subtitle,
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
-                                               UsageLimit = promotion.UsageLimit
+                                               UsageLimit = promotion.UsageLimit,
+                                               Type = promotion.Type
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.Where(x => x.AdvertisementId == advertisementIdDecrypted).ToList().Count();
@@ -224,7 +228,6 @@ namespace CouponService.Repository
 
                 int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
                 int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
-                int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
 
                 Promotions promotion = new Promotions()
                 {
@@ -237,18 +240,24 @@ namespace CouponService.Repository
                     StartAt = model.StartAt,
                     Subtitle = model.Subtitle,
                     Title = model.Title,
-                    UsageLimit = model.UsageLimit
+                    UsageLimit = model.UsageLimit,
+                    Type = model.Type
                 };
                 _context.Promotions.Add(promotion);
                 _context.SaveChanges();
 
-                PromotionsPlaces promotionsPlace = new PromotionsPlaces()
+                if (!string.IsNullOrEmpty(model.PlaceId))
                 {
-                    PromotionId = promotion.PromotionId,
-                    PlaceId = placeIdDecrypted
-                };
-                _context.PromotionsPlaces.Add(promotionsPlace);
-                _context.SaveChanges();
+                    int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
+                    PromotionsPlaces promotionsPlace = new PromotionsPlaces()
+                    {
+                        PromotionId = promotion.PromotionId,
+                        PlaceId = placeIdDecrypted
+                    };
+                    _context.PromotionsPlaces.Add(promotionsPlace);
+                    _context.SaveChanges();
+                }
+
                 return ReturnResponse.SuccessResponse(CommonMessage.PromotionsInsert, true);
             }
             catch (Exception ex)
@@ -264,7 +273,7 @@ namespace CouponService.Repository
                 int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PromotionId), _appSettings.PrimeInverse);
                 int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
                 int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
-                int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
+                int placeIdDecrypted = 0;
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
@@ -272,11 +281,13 @@ namespace CouponService.Repository
                 if (promotion == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.PromotionsNotFound, StatusCodes.Status404NotFound);
 
-                var place = _context.Places.Where(x => x.PlaceId == placeIdDecrypted).FirstOrDefault();
-                if (place == null)
-                    return ReturnResponse.ErrorResponse(CommonMessage.PlacesNotFound, StatusCodes.Status404NotFound);
-
-                var promotionPlace = promotion.PromotionsPlaces.Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
+                if (!string.IsNullOrEmpty(model.PlaceId))
+                {
+                    placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
+                    var place = _context.Places.Where(x => x.PlaceId == placeIdDecrypted).FirstOrDefault();
+                    if (place == null)
+                        return ReturnResponse.ErrorResponse(CommonMessage.PlacesNotFound, StatusCodes.Status404NotFound);
+                }
 
                 promotion.AdvertisementId = advertisementIdDecrypted;
                 promotion.LogoUrl = model.LogoUrl;
@@ -288,11 +299,17 @@ namespace CouponService.Repository
                 promotion.Title = model.Title;
                 promotion.UpdatedAt = DateTime.Now;
                 promotion.UsageLimit = model.UsageLimit;
-                promotionPlace.PlaceId = placeIdDecrypted;
-
+                promotion.Type = model.Type;
                 _context.Promotions.Update(promotion);
-                _context.PromotionsPlaces.Update(promotionPlace);
                 _context.SaveChanges();
+
+                if (!string.IsNullOrEmpty(model.PlaceId))
+                {
+                    var promotionPlace = promotion.PromotionsPlaces.Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
+                    promotionPlace.PlaceId = placeIdDecrypted;
+                    _context.PromotionsPlaces.Update(promotionPlace);
+                    _context.SaveChanges();
+                }
                 return ReturnResponse.SuccessResponse(CommonMessage.PromotionsUpdate, false);
             }
             catch (Exception ex)

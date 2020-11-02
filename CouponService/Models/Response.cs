@@ -132,4 +132,10 @@ namespace CouponService.Models
         public Pagination pagination { get; set; }
         public List<AdvertisementsModel> data { get; set; }
     }
+
+    public class LinkResponse : Response
+    {
+        public Pagination pagination { get; set; }
+        public List<LinksModel> data { get; set; }
+    }
 }

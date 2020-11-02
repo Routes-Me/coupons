@@ -161,6 +161,7 @@ namespace CouponService.Helper.Repository
                                           InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotions.InstitutionId), _appSettings.Prime).ToString(),
                                           IsSharable = promotions.IsSharable,
                                           LogoUrl = promotions.LogoUrl,
+                                          Type = promotions.Type
                                       }).AsEnumerable().FirstOrDefault();
 
                 promotion.Add(couponsDetails);
@@ -262,6 +263,37 @@ namespace CouponService.Helper.Repository
             }
             var couponsList = coupons.GroupBy(x => x.CouponId).Select(a => a.First()).ToList();
             return Common.SerializeJsonForIncludedRepo(couponsList.Cast<dynamic>().ToList());
+        }
+
+        public dynamic GetLinksPromotionIncludedData(List<LinksModel> linkModelList)
+        {
+            List<PromotionsModel> promotion = new List<PromotionsModel>();
+            foreach (var item in linkModelList)
+            {
+                var promoIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.PromotionId), _appSettings.PrimeInverse);
+                var couponsDetails = (from promotions in _context.Promotions
+                                      where promotions.PromotionId == promoIdDecrypted
+                                      select new PromotionsModel()
+                                      {
+                                          PromotionId = ObfuscationClass.EncodeId(promotions.PromotionId, _appSettings.Prime).ToString(),
+                                          Title = promotions.Title,
+                                          Subtitle = promotions.Subtitle,
+                                          CreatedAt = promotions.CreatedAt,
+                                          UpdatedAt = promotions.UpdatedAt,
+                                          StartAt = promotions.StartAt,
+                                          EndAt = promotions.EndAt,
+                                          UsageLimit = promotions.UsageLimit,
+                                          AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotions.AdvertisementId), _appSettings.Prime).ToString(),
+                                          InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotions.InstitutionId), _appSettings.Prime).ToString(),
+                                          IsSharable = promotions.IsSharable,
+                                          LogoUrl = promotions.LogoUrl,
+                                          Type = promotions.Type
+                                      }).AsEnumerable().FirstOrDefault();
+
+                promotion.Add(couponsDetails);
+            }
+            var promotionList = promotion.GroupBy(x => x.PromotionId).Select(a => a.First()).ToList();
+            return Common.SerializeJsonForIncludedRepo(promotionList.Cast<dynamic>().ToList());
         }
     }
 }

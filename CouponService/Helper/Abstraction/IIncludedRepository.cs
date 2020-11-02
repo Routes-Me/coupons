@@ -19,5 +19,6 @@ namespace CouponService.Helper.Abstraction
         dynamic GetPromotionIncludedData(List<CouponsModel> placeModelList);
         dynamic GetUserIncludedDataForRedemption(List<RedemptionGetModel> redemptionModelList);
         dynamic GetSearchCouponIncludedData(List<RedemptionGetModel> redemptionModelList, string search);
+        dynamic GetLinksPromotionIncludedData(List<LinksModel> linkModelList);
     }
 }
