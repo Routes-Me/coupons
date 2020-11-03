@@ -12,6 +12,7 @@ using Obfuscation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static CouponService.Models.ReturnResponse;
 
 namespace CouponService.Repository
 {
@@ -221,6 +222,7 @@ namespace CouponService.Repository
 
         public dynamic InsertPromotions(PromotionsPostModel model)
         {
+            PromotionsPostResponse response = new PromotionsPostResponse();
             try
             {
                 if (model == null)
@@ -257,13 +259,21 @@ namespace CouponService.Repository
                     _context.PromotionsPlaces.Add(promotionsPlace);
                     _context.SaveChanges();
                 }
-
-                return ReturnResponse.SuccessResponse(CommonMessage.PromotionsInsert, true);
+                response.status = true;
+                response.statusCode = StatusCodes.Status201Created;
+                response.message = CommonMessage.PromotionsInsert;
+                response.promotionsId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString();
+                return response;
+               
+                //return ReturnResponse.SuccessResponse(CommonMessage.PromotionsInsert, true);
             }
             catch (Exception ex)
             {
                 return ReturnResponse.ExceptionResponse(ex);
             }
+             
+
+            //return ReturnResponse.SuccessResponse(CommonMessage.PromotionsInsert, true);
         }
 
         public dynamic UpdatePromotions(PromotionsPostModel model)

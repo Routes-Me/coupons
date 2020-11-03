@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-
+ 
 namespace CouponService.Models
 {
     public class Response
@@ -45,6 +45,11 @@ namespace CouponService.Models
             response.message = message;
             response.statusCode = statusCode;
             return response;
+        }
+
+        public class PromotionsPostResponse : Response
+        {
+            public string promotionsId { get; set; }
         }
     }
 
