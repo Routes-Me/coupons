@@ -2,6 +2,7 @@
 using CouponService.Abstraction;
 using CouponService.Models;
 using CouponService.Models.ResponseModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CouponService.Controllers
@@ -24,6 +25,7 @@ namespace CouponService.Controllers
             return StatusCode((int)response.statusCode, response);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("places/{id=0}")]
         public IActionResult Get(string id, [FromQuery] Pagination pageInfo)
