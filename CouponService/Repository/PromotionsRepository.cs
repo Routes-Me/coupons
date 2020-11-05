@@ -233,6 +233,9 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
+                if (model.Code.Length > 5)
+                    return ReturnResponse.ErrorResponse(CommonMessage.CodeLength, StatusCodes.Status400BadRequest);
+
                 int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
                 int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
 
@@ -300,6 +303,9 @@ namespace CouponService.Repository
         {
             try
             {
+                if (model.Code.Length > 5)
+                    return ReturnResponse.ErrorResponse(CommonMessage.CodeLength, StatusCodes.Status400BadRequest);
+
                 int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PromotionId), _appSettings.PrimeInverse);
                 int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
                 int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);

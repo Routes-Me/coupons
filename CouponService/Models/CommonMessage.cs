@@ -45,5 +45,7 @@
         public static string LinksInsert = "Links inserted successfully.";
         public static string LinksUpdate = "Links updated successfully.";
         public static string LinksConflict = "Links are associated with promotions.";
+        public static string CodeLength = "Code length should not more than 5 characters.";
+        
     }
 }
