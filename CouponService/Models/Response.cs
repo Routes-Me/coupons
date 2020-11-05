@@ -21,7 +21,7 @@ namespace CouponService.Models
         {
             Response response = new Response();
             response.status = false;
-            response.message = CommonMessage.ExceptionMessage;
+            response.message = CommonMessage.ExceptionMessage + ex.Message;
             response.statusCode = StatusCodes.Status500InternalServerError;
             return response;
         }
@@ -45,11 +45,6 @@ namespace CouponService.Models
             response.message = message;
             response.statusCode = statusCode;
             return response;
-        }
-
-        public class PromotionsPostResponse : Response
-        {
-            public string promotionsId { get; set; }
         }
     }
 
@@ -142,5 +137,9 @@ namespace CouponService.Models
     {
         public Pagination pagination { get; set; }
         public List<LinksModel> data { get; set; }
+    }
+    public class PromotionsPostResponse : Response
+    {
+        public string promotionsId { get; set; }
     }
 }

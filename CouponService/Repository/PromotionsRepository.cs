@@ -27,6 +27,7 @@ namespace CouponService.Repository
             _context = context;
             _includedRepository = includedRepository;
         }
+
         public dynamic DeletePromotions(string id)
         {
             try
@@ -259,21 +260,35 @@ namespace CouponService.Repository
                     _context.PromotionsPlaces.Add(promotionsPlace);
                     _context.SaveChanges();
                 }
+
+                if (!string.IsNullOrEmpty(model.Type) && model.Type.ToString().ToLower() == "links")
+                {
+                    if (model.Links != null)
+                    {
+                        if (!string.IsNullOrEmpty(model.Links.Android) || !string.IsNullOrEmpty(model.Links.Web) || !string.IsNullOrEmpty(model.Links.Ios))
+                        {
+                            Links modelLinks = new Links()
+                            {
+                                PromotionId = promotion.PromotionId,
+                                Web = model.Links.Web,
+                                Ios = model.Links.Ios,
+                                Android = model.Links.Android,
+                            };
+                            _context.Links.Add(modelLinks);
+                            _context.SaveChanges();
+                        }
+                    }
+                }
                 response.status = true;
                 response.statusCode = StatusCodes.Status201Created;
                 response.message = CommonMessage.PromotionsInsert;
                 response.promotionsId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString();
                 return response;
-               
-                //return ReturnResponse.SuccessResponse(CommonMessage.PromotionsInsert, true);
             }
             catch (Exception ex)
             {
                 return ReturnResponse.ExceptionResponse(ex);
             }
-             
-
-            //return ReturnResponse.SuccessResponse(CommonMessage.PromotionsInsert, true);
         }
 
         public dynamic UpdatePromotions(PromotionsPostModel model)
@@ -287,7 +302,7 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var promotion = _context.Promotions.Include(x => x.PromotionsPlaces).Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
+                var promotion = _context.Promotions.Include(x => x.PromotionsPlaces).Include(x => x.Links).Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
                 if (promotion == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.PromotionsNotFound, StatusCodes.Status404NotFound);
 
@@ -319,6 +334,28 @@ namespace CouponService.Repository
                     promotionPlace.PlaceId = placeIdDecrypted;
                     _context.PromotionsPlaces.Update(promotionPlace);
                     _context.SaveChanges();
+                }
+                if (!string.IsNullOrEmpty(model.Type) && model.Type.ToString().ToLower() == "links")
+                {
+                    if (model.Links != null)
+                    {
+                        var promotionLinks = promotion.Links.Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
+                        if (promotionLinks != null)
+                        {
+                            _context.Links.Remove(promotionLinks);
+                            _context.SaveChanges();
+                        }
+
+                        Links modelLinks = new Links()
+                        {
+                            PromotionId = promotionIdDecrypted,
+                            Web = model.Links.Web,
+                            Ios = model.Links.Ios,
+                            Android = model.Links.Android,
+                        };
+                        _context.Links.Add(modelLinks);
+                        _context.SaveChanges();
+                    }
                 }
                 return ReturnResponse.SuccessResponse(CommonMessage.PromotionsUpdate, false);
             }

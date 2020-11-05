@@ -23,6 +23,8 @@ namespace CouponService.Models.ResponseModel
         public bool? IsSharable { get; set; }
         public string LogoUrl { get; set; }
         public string Type { get; set; }
+        public LinkPostModel Links { get; set; }
+
     }
 
     public class PromotionsModel
@@ -40,5 +42,12 @@ namespace CouponService.Models.ResponseModel
         public bool? IsSharable { get; set; }
         public string LogoUrl { get; set; }
         public string Type { get; set; }
+    }
+
+    public class LinkPostModel
+    {
+        public string Web { get; set; }
+        public string Ios { get; set; }
+        public string Android { get; set; }
     }
 }
