@@ -75,7 +75,8 @@ namespace CouponService.Repository
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
                                                UsageLimit = promotion.UsageLimit,
-                                               Type = promotion.Type
+                                               Type = promotion.Type,
+                                               Code = promotion.Code
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.ToList().Count();
@@ -98,7 +99,8 @@ namespace CouponService.Repository
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
                                                UsageLimit = promotion.UsageLimit,
-                                               Type = promotion.Type
+                                               Type = promotion.Type,
+                                               Code = promotion.Code
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.Where(x => x.PromotionId == promotionIdDecrypted).ToList().Count();
@@ -172,7 +174,8 @@ namespace CouponService.Repository
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
                                                UsageLimit = promotion.UsageLimit,
-                                               Type = promotion.Type
+                                               Type = promotion.Type,
+                                               Code = promotion.Code
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.ToList().Count();
@@ -195,7 +198,8 @@ namespace CouponService.Repository
                                                Title = promotion.Title,
                                                UpdatedAt = promotion.UpdatedAt,
                                                UsageLimit = promotion.UsageLimit,
-                                               Type = promotion.Type
+                                               Type = promotion.Type,
+                                               Code = promotion.Code
                                            }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Promotions.Where(x => x.AdvertisementId == advertisementIdDecrypted).ToList().Count();
@@ -244,7 +248,8 @@ namespace CouponService.Repository
                     Subtitle = model.Subtitle,
                     Title = model.Title,
                     UsageLimit = model.UsageLimit,
-                    Type = model.Type
+                    Type = model.Type,
+                    Code = model.Code
                 };
                 _context.Promotions.Add(promotion);
                 _context.SaveChanges();
@@ -325,6 +330,7 @@ namespace CouponService.Repository
                 promotion.UpdatedAt = DateTime.Now;
                 promotion.UsageLimit = model.UsageLimit;
                 promotion.Type = model.Type;
+                promotion.Code = model.Code;
                 _context.Promotions.Update(promotion);
                 _context.SaveChanges();
 

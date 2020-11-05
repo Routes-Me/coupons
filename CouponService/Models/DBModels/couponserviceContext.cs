@@ -22,15 +22,6 @@ namespace CouponService.Models.DBModels
         public virtual DbSet<PromotionsPlaces> PromotionsPlaces { get; set; }
         public virtual DbSet<Redemptions> Redemptions { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("server=localhost;port=3306;user=nirmal;password=NirmalTheOne@123;database=couponservice", x => x.ServerVersion("8.0.20-mysql"));
-            }
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Coupons>(entity =>
@@ -131,6 +122,12 @@ namespace CouponService.Models.DBModels
                 entity.Property(e => e.PromotionId).HasColumnName("promotion_id");
 
                 entity.Property(e => e.AdvertisementId).HasColumnName("advertisement_id");
+
+                entity.Property(e => e.Code)
+                    .HasColumnName("code")
+                    .HasColumnType("varchar(5)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")

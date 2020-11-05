@@ -25,6 +25,7 @@ namespace CouponService.Models.DBModels
         public bool? IsSharable { get; set; }
         public string LogoUrl { get; set; }
         public string Type { get; set; }
+        public string Code { get; set; }
 
         public virtual ICollection<Coupons> Coupons { get; set; }
         public virtual ICollection<Links> Links { get; set; }
