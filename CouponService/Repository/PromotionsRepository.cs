@@ -233,11 +233,42 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                if (model.Code.Length > 5)
-                    return ReturnResponse.ErrorResponse(CommonMessage.CodeLength, StatusCodes.Status400BadRequest);
+                if (string.IsNullOrEmpty(model.Subtitle))
+                    model.Subtitle = null;
 
                 if (string.IsNullOrEmpty(model.InstitutionId))
                     model.InstitutionId = null;
+
+                if (string.IsNullOrEmpty(model.Code))
+                    model.Code = null;
+
+                if (model.Code.Length > 5)
+                    model.Code = model.Code.Substring(0, 5);
+
+                if (!string.IsNullOrEmpty(model.Type) && model.Type.ToString().ToLower() == "links")
+                {
+                    if (model.Links == null)
+                    {
+                        return ReturnResponse.ErrorResponse(CommonMessage.LinksRequired, StatusCodes.Status400BadRequest);
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(model.Links.Web))
+                            return ReturnResponse.ErrorResponse(CommonMessage.WebLinkRequired, StatusCodes.Status400BadRequest);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.Type) && model.Type.ToLower() == "coupons")
+                {
+                    if (string.IsNullOrEmpty(Convert.ToString(model.UsageLimit)))
+                        model.UsageLimit = 1000;
+
+                    if (string.IsNullOrEmpty(Convert.ToString(model.StartAt)))
+                        model.StartAt = DateTime.Now;
+
+                    if (string.IsNullOrEmpty(Convert.ToString(model.EndAt)))
+                        model.EndAt = DateTime.Now.AddMonths(1);
+                }
 
                 int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
                 int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
@@ -306,18 +337,50 @@ namespace CouponService.Repository
         {
             try
             {
-                if (model.Code.Length > 5)
-                    return ReturnResponse.ErrorResponse(CommonMessage.CodeLength, StatusCodes.Status400BadRequest);
+                if (model == null)
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
+
+                if (string.IsNullOrEmpty(model.Subtitle))
+                    model.Subtitle = null;
 
                 if (string.IsNullOrEmpty(model.InstitutionId))
                     model.InstitutionId = null;
+
+                if (string.IsNullOrEmpty(model.Code))
+                    model.Code = null;
+
+                if (model.Code.Length > 5)
+                    model.Code = model.Code.Substring(0, 5);
+
+                if (!string.IsNullOrEmpty(model.Type) && model.Type.ToString().ToLower() == "links")
+                {
+                    if (model.Links == null)
+                    {
+                        return ReturnResponse.ErrorResponse(CommonMessage.LinksRequired, StatusCodes.Status400BadRequest);
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(model.Links.Web))
+                            return ReturnResponse.ErrorResponse(CommonMessage.WebLinkRequired, StatusCodes.Status400BadRequest);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.Type) && model.Type.ToLower() == "coupons")
+                {
+                    if (string.IsNullOrEmpty(Convert.ToString(model.UsageLimit)))
+                        model.UsageLimit = 1000;
+
+                    if (string.IsNullOrEmpty(Convert.ToString(model.StartAt)))
+                        model.StartAt = DateTime.Now;
+
+                    if (string.IsNullOrEmpty(Convert.ToString(model.EndAt)))
+                        model.EndAt = DateTime.Now.AddMonths(1);
+                }
 
                 int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PromotionId), _appSettings.PrimeInverse);
                 int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
                 int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
                 int placeIdDecrypted = 0;
-                if (model == null)
-                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
                 var promotion = _context.Promotions.Include(x => x.PromotionsPlaces).Include(x => x.Links).Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
                 if (promotion == null)
