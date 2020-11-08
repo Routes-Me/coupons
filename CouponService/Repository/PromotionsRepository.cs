@@ -241,8 +241,7 @@ namespace CouponService.Repository
 
                 if (string.IsNullOrEmpty(model.Code))
                     model.Code = null;
-
-                if (model.Code.Length > 5)
+                else if (model.Code.Length > 5)
                     model.Code = model.Code.Substring(0, 5);
 
                 if (!string.IsNullOrEmpty(model.Type) && model.Type.ToString().ToLower() == "links")
@@ -348,8 +347,7 @@ namespace CouponService.Repository
 
                 if (string.IsNullOrEmpty(model.Code))
                     model.Code = null;
-
-                if (model.Code.Length > 5)
+                else if (model.Code.Length > 5)
                     model.Code = model.Code.Substring(0, 5);
 
                 if (!string.IsNullOrEmpty(model.Type) && model.Type.ToString().ToLower() == "links")
