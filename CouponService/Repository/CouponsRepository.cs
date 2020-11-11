@@ -54,7 +54,7 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetCoupons(string id, string userId, Pagination pageInfo, string includeType)
+        public dynamic GetCoupons(string id, string userId, string promotionsId, Pagination pageInfo, string includeType)
         {
             CouponGetResponse response = new CouponGetResponse();
             int totalCount = 0;
@@ -62,70 +62,142 @@ namespace CouponService.Repository
             {
                 int couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
                 int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(userId), _appSettings.PrimeInverse);
+                int promotionsIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(promotionsId), _appSettings.PrimeInverse);
                 List<CouponsModel> placeModelList = new List<CouponsModel>();
 
                 if (userIdDecrypted == 0)
                 {
                     if (couponIdDecrypted == 0)
                     {
-                        placeModelList = (from coupon in _context.Coupons
-                                          select new CouponsModel()
-                                          {
-                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
-                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
-                                              CreatedAt = coupon.CreatedAt,
-                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
-                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                        if (promotionsIdDecrypted == 0)
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.ToList().Count();
+                            totalCount = _context.Coupons.ToList().Count();
+                        }
+                        else
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              where coupon.PromotionId == promotionsIdDecrypted
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                            totalCount = _context.Coupons.ToList().Count();
+                        }
+
                     }
                     else
                     {
-                        placeModelList = (from coupon in _context.Coupons
-                                          where coupon.CouponId == couponIdDecrypted
-                                          select new CouponsModel()
-                                          {
-                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
-                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
-                                              CreatedAt = coupon.CreatedAt,
-                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
-                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                        if (promotionsIdDecrypted == 0)
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              where coupon.CouponId == couponIdDecrypted
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.Where(x=>x.CouponId == couponIdDecrypted).ToList().Count();
+                            totalCount = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted).ToList().Count();
+                        }
+                        else
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              where coupon.CouponId == couponIdDecrypted && coupon.PromotionId == promotionsIdDecrypted
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                            totalCount = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted).ToList().Count();
+                        }
+
                     }
                 }
                 else
                 {
                     if (couponIdDecrypted == 0)
                     {
-                        placeModelList = (from coupon in _context.Coupons
-                                          where coupon.UserId == userIdDecrypted
-                                          select new CouponsModel()
-                                          {
-                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
-                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
-                                              CreatedAt = coupon.CreatedAt,
-                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
-                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                        if (promotionsIdDecrypted == 0)
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              where coupon.UserId == userIdDecrypted
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.Where(x => x.UserId == userIdDecrypted).ToList().Count();
+                            totalCount = _context.Coupons.Where(x => x.UserId == userIdDecrypted).ToList().Count();
+                        }
+                        else
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              where coupon.UserId == userIdDecrypted && coupon.PromotionId == promotionsIdDecrypted
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                            totalCount = _context.Coupons.Where(x => x.UserId == userIdDecrypted).ToList().Count();
+                        }
+
                     }
                     else
                     {
-                        placeModelList = (from coupon in _context.Coupons
-                                          where coupon.CouponId == couponIdDecrypted && coupon.UserId == userIdDecrypted
-                                          select new CouponsModel()
-                                          {
-                                              CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
-                                              PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
-                                              CreatedAt = coupon.CreatedAt,
-                                              UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
-                                          }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                        if (promotionsIdDecrypted == 0)
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              where coupon.CouponId == couponIdDecrypted && coupon.UserId == userIdDecrypted
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                        totalCount = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted && x.UserId == userIdDecrypted).ToList().Count();
+                            totalCount = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted && x.UserId == userIdDecrypted).ToList().Count();
+                        }
+                        else
+                        {
+                            placeModelList = (from coupon in _context.Coupons
+                                              where coupon.CouponId == couponIdDecrypted && coupon.UserId == userIdDecrypted && coupon.PromotionId == promotionsIdDecrypted
+                                              select new CouponsModel()
+                                              {
+                                                  CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                                  PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime).ToString(),
+                                                  CreatedAt = coupon.CreatedAt,
+                                                  UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime).ToString()
+                                              }).AsEnumerable().OrderBy(a => a.CouponId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                            totalCount = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted && x.UserId == userIdDecrypted).ToList().Count();
+                        }
                     }
                 }
-               
+
                 dynamic includeData = new JObject();
                 if (!string.IsNullOrEmpty(includeType))
                 {
@@ -192,7 +264,7 @@ namespace CouponService.Repository
                     if (Convert.ToDateTime(couponData.CreatedAt).AddHours(14) >= DateTime.Now)
                     {
                         TimeSpan remainHour = Convert.ToDateTime(Convert.ToDateTime(couponData.CreatedAt).AddHours(14)) - DateTime.Now;
-                        return ReturnResponse.ErrorResponse("Coupons already generated for this promotion. You can try again after "+ Convert.ToDecimal(remainHour.TotalHours).ToString("#.##") + " hours.", StatusCodes.Status400BadRequest);
+                        return ReturnResponse.ErrorResponse("Coupons already generated for this promotion. You can try again after " + Convert.ToDecimal(remainHour.TotalHours).ToString("#.##") + " hours.", StatusCodes.Status400BadRequest);
                     }
                 }
 

@@ -48,62 +48,118 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetPromotions(string id, Pagination pageInfo, string includeType)
+        public dynamic GetPromotions(string id, string advertisementId, Pagination pageInfo, string includeType)
         {
             PromotionsGetResponse response = new PromotionsGetResponse();
             int totalCount = 0;
             try
             {
                 int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(advertisementId), _appSettings.PrimeInverse);
+
                 Transposition transposition = new Transposition();
                 List<PromotionsModel> promotionsModelList = new List<PromotionsModel>();
 
                 if (promotionIdDecrypted == 0)
                 {
-                    promotionsModelList = (from promotion in _context.Promotions
-                                           select new PromotionsModel()
-                                           {
-                                               PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                               AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
-                                               CreatedAt = promotion.CreatedAt,
-                                               EndAt = promotion.EndAt,
-                                               InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
-                                               IsSharable = promotion.IsSharable,
-                                               LogoUrl = promotion.LogoUrl,
-                                               StartAt = promotion.StartAt,
-                                               Subtitle = promotion.Subtitle,
-                                               Title = promotion.Title,
-                                               UpdatedAt = promotion.UpdatedAt,
-                                               UsageLimit = promotion.UsageLimit,
-                                               Type = promotion.Type,
-                                               Code = promotion.Code
-                                           }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (advertisementIdDecrypted == 0)
+                    {
+                        promotionsModelList = (from promotion in _context.Promotions
+                                               select new PromotionsModel()
+                                               {
+                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
+                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   CreatedAt = promotion.CreatedAt,
+                                                   EndAt = promotion.EndAt,
+                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   IsSharable = promotion.IsSharable,
+                                                   LogoUrl = promotion.LogoUrl,
+                                                   StartAt = promotion.StartAt,
+                                                   Subtitle = promotion.Subtitle,
+                                                   Title = promotion.Title,
+                                                   UpdatedAt = promotion.UpdatedAt,
+                                                   UsageLimit = promotion.UsageLimit,
+                                                   Type = promotion.Type,
+                                                   Code = promotion.Code
+                                               }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Promotions.ToList().Count();
+                        totalCount = _context.Promotions.ToList().Count();
+                    }
+                    else
+                    {
+                        promotionsModelList = (from promotion in _context.Promotions
+                                               where promotion.AdvertisementId == advertisementIdDecrypted
+                                               select new PromotionsModel()
+                                               {
+                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
+                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   CreatedAt = promotion.CreatedAt,
+                                                   EndAt = promotion.EndAt,
+                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   IsSharable = promotion.IsSharable,
+                                                   LogoUrl = promotion.LogoUrl,
+                                                   StartAt = promotion.StartAt,
+                                                   Subtitle = promotion.Subtitle,
+                                                   Title = promotion.Title,
+                                                   UpdatedAt = promotion.UpdatedAt,
+                                                   UsageLimit = promotion.UsageLimit,
+                                                   Type = promotion.Type,
+                                                   Code = promotion.Code
+                                               }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Promotions.Where(x => x.AdvertisementId == advertisementIdDecrypted).ToList().Count();
+                    }
                 }
                 else
                 {
-                    promotionsModelList = (from promotion in _context.Promotions
-                                           where promotion.PromotionId == promotionIdDecrypted
-                                           select new PromotionsModel()
-                                           {
-                                               PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                               AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
-                                               CreatedAt = promotion.CreatedAt,
-                                               EndAt = promotion.EndAt,
-                                               InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
-                                               IsSharable = promotion.IsSharable,
-                                               LogoUrl = promotion.LogoUrl,
-                                               StartAt = promotion.StartAt,
-                                               Subtitle = promotion.Subtitle,
-                                               Title = promotion.Title,
-                                               UpdatedAt = promotion.UpdatedAt,
-                                               UsageLimit = promotion.UsageLimit,
-                                               Type = promotion.Type,
-                                               Code = promotion.Code
-                                           }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (advertisementIdDecrypted == 0)
+                    {
+                        promotionsModelList = (from promotion in _context.Promotions
+                                               where promotion.PromotionId == promotionIdDecrypted
+                                               select new PromotionsModel()
+                                               {
+                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
+                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   CreatedAt = promotion.CreatedAt,
+                                                   EndAt = promotion.EndAt,
+                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   IsSharable = promotion.IsSharable,
+                                                   LogoUrl = promotion.LogoUrl,
+                                                   StartAt = promotion.StartAt,
+                                                   Subtitle = promotion.Subtitle,
+                                                   Title = promotion.Title,
+                                                   UpdatedAt = promotion.UpdatedAt,
+                                                   UsageLimit = promotion.UsageLimit,
+                                                   Type = promotion.Type,
+                                                   Code = promotion.Code
+                                               }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Promotions.Where(x => x.PromotionId == promotionIdDecrypted).ToList().Count();
+                        totalCount = _context.Promotions.Where(x => x.PromotionId == promotionIdDecrypted).ToList().Count();
+                    }
+                    else
+                    {
+                        promotionsModelList = (from promotion in _context.Promotions
+                                               where promotion.PromotionId == promotionIdDecrypted && promotion.AdvertisementId == advertisementIdDecrypted
+                                               select new PromotionsModel()
+                                               {
+                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
+                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   CreatedAt = promotion.CreatedAt,
+                                                   EndAt = promotion.EndAt,
+                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   IsSharable = promotion.IsSharable,
+                                                   LogoUrl = promotion.LogoUrl,
+                                                   StartAt = promotion.StartAt,
+                                                   Subtitle = promotion.Subtitle,
+                                                   Title = promotion.Title,
+                                                   UpdatedAt = promotion.UpdatedAt,
+                                                   UsageLimit = promotion.UsageLimit,
+                                                   Type = promotion.Type,
+                                                   Code = promotion.Code
+                                               }).AsEnumerable().OrderBy(a => a.PromotionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Promotions.Where(x => x.PromotionId == promotionIdDecrypted && x.AdvertisementId == advertisementIdDecrypted).ToList().Count();
+                    }
                 }
                 var page = new Pagination
                 {
