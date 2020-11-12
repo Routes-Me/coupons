@@ -184,6 +184,10 @@ namespace CouponService.Repository
                             {
                                 includeData.institutions = _includedRepository.GetInstitutionsIncludedData(promotionsModelList);
                             }
+                            else if (item.ToLower() == "link" || item.ToLower() == "links")
+                            {
+                                includeData.links = _includedRepository.GetLinksIncludedData(promotionsModelList);
+                            }
                         }
                     }
                 }
