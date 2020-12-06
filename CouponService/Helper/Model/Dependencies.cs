@@ -12,5 +12,8 @@ namespace CouponService.Helper.Model
         public string AdvertisementsUrl { get; set; }
         public string OfficersUrl { get; set; }
         public string AuthoritiesUrl { get; set; }
+        public string GetAnalyticsUrl { get; set; }
+        public string PostAnalyticsUrl { get; set; }
+
     }
 }

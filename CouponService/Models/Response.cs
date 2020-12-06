@@ -142,4 +142,9 @@ namespace CouponService.Models
     {
         public string promotionsId { get; set; }
     }
+
+    public class GetAnalyticsResponse : Response
+    {
+        public DateTime? CreatedAt { get; set; }
+    }
 }
