@@ -153,6 +153,7 @@ namespace CouponService.Repository
                 response.message = CommonMessage.LinksRetrived;
                 response.pagination = page;
                 response.data = linkModelList;
+                response.included = includeData;
                 response.statusCode = StatusCodes.Status200OK;
                 return response;
             }
