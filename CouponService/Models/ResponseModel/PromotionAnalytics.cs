@@ -9,6 +9,7 @@ namespace CouponService.Models.ResponseModel
     {
         public string PromotionId { get; set; }
         public string AdvertismentId { get; set; }
+        public string InstitutionId { get; set; }
         public int? Count { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string Type { get; set; }

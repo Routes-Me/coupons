@@ -56,8 +56,9 @@ namespace CouponService.Repository
                             PromotionAnalytics promotionAnalytics = new PromotionAnalytics();
                             promotionAnalytics.PromotionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.PromotionId, _appSettings.Prime).ToString();
                             promotionAnalytics.AdvertismentId = ObfuscationClass.EncodeId(items.Coupon.Promotion.AdvertisementId.GetValueOrDefault(), _appSettings.Prime).ToString();
+                            promotionAnalytics.InstitutionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.InstitutionId.GetValueOrDefault(), _appSettings.Prime).ToString();
                             promotionAnalytics.CreatedAt = DateTime.Now;
-                            promotionAnalytics.Count = group.Key;
+                            promotionAnalytics.Count = group.Count();
                             promotionAnalytics.Type = "coupons";
                             promotionAnalyticsList.Add(promotionAnalytics);
                         }
@@ -94,8 +95,9 @@ namespace CouponService.Repository
                             PromotionAnalytics promotionAnalytics = new PromotionAnalytics();
                             promotionAnalytics.PromotionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.PromotionId, _appSettings.Prime).ToString();
                             promotionAnalytics.AdvertismentId = ObfuscationClass.EncodeId(items.Coupon.Promotion.AdvertisementId.GetValueOrDefault(), _appSettings.Prime).ToString();
+                            promotionAnalytics.InstitutionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.InstitutionId.GetValueOrDefault(), _appSettings.Prime).ToString();
                             promotionAnalytics.CreatedAt = DateTime.Now;
-                            promotionAnalytics.Count = group.Key;
+                            promotionAnalytics.Count = group.Count();
                             promotionAnalytics.Type = "coupons";
                             promotionAnalyticsList.Add(promotionAnalytics);
                         }
