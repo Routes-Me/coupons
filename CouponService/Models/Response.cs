@@ -137,9 +137,16 @@ namespace CouponService.Models
     {
         public Pagination pagination { get; set; }
         public List<LinksModel> data { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public JObject included { get; set; }
     }
     public class PromotionsPostResponse : Response
     {
         public string promotionsId { get; set; }
+    }
+
+    public class GetAnalyticsResponse : Response
+    {
+        public DateTime? CreatedAt { get; set; }
     }
 }

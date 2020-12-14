@@ -21,6 +21,8 @@ namespace CouponService.Models.ResponseModel
         public string InstitutionId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string MediaId { get; set; }
+        public int? TintColor { get; set; }
+        public int? InvertedTintColor { get; set; }
     }
 
     public class UserModel

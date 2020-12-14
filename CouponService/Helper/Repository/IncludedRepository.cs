@@ -115,7 +115,6 @@ namespace CouponService.Helper.Repository
             List<UserModel> userModel = new List<UserModel>();
             foreach (var item in redemptionModelList)
             {
-
                 var couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.CouponId), _appSettings.PrimeInverse);
                 var couponsDetails = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted).FirstOrDefault();
                 if (couponsDetails != null)
@@ -294,6 +293,29 @@ namespace CouponService.Helper.Repository
             }
             var promotionList = promotion.GroupBy(x => x.PromotionId).Select(a => a.First()).ToList();
             return Common.SerializeJsonForIncludedRepo(promotionList.Cast<dynamic>().ToList());
+        }
+
+        public dynamic GetLinksIncludedData(List<PromotionsModel> promotionsModelList)
+        {
+            List<LinksModel> linksModel = new List<LinksModel>();
+            foreach (var item in promotionsModelList)
+            {
+                var promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.PromotionId), _appSettings.PrimeInverse);
+                var linksDetails = (from links in _context.Links
+                                    where links.PromotionId == promotionIdDecrypted
+                                    select new LinksModel()
+                                    {
+                                        LinkId = ObfuscationClass.EncodeId(links.LinkId, _appSettings.Prime).ToString(),
+                                        PromotionId = ObfuscationClass.EncodeId(links.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                        Web = links.Web,
+                                        Ios = links.Ios,
+                                        Android = links.Android
+                                    }).AsEnumerable().FirstOrDefault();
+                if (linksDetails != null)
+                    linksModel.Add(linksDetails);
+            }
+            var linkList = linksModel.GroupBy(x => x.LinkId).Select(a => a.First()).ToList();
+            return Common.SerializeJsonForIncludedRepo(linkList.Cast<dynamic>().ToList());
         }
     }
 }

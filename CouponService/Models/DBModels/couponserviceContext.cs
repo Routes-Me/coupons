@@ -65,22 +65,22 @@ namespace CouponService.Models.DBModels
                 entity.Property(e => e.Android)
                     .HasColumnName("android")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.Ios)
                     .HasColumnName("ios")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.PromotionId).HasColumnName("promotion_id");
 
                 entity.Property(e => e.Web)
                     .HasColumnName("web")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.Links)
@@ -144,8 +144,8 @@ namespace CouponService.Models.DBModels
                 entity.Property(e => e.LogoUrl)
                     .HasColumnName("logo_url")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.StartAt)
                     .HasColumnName("start_at")
@@ -166,8 +166,8 @@ namespace CouponService.Models.DBModels
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
                     .HasColumnType("enum('places','links','coupons')")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")

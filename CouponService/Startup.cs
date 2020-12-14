@@ -1,5 +1,7 @@
 using CouponService.Abstraction;
 using CouponService.Helper.Abstraction;
+using CouponService.Helper.CronJobServices;
+using CouponService.Helper.CronJobServices.CronJobExtensionMethods;
 using CouponService.Helper.Model;
 using CouponService.Helper.Repository;
 using CouponService.Repository;
@@ -56,6 +58,13 @@ namespace CouponService
             services.AddScoped<IIncludedRepository, IncludedRepository>();
             services.AddScoped<IRedemptionRepository, RedemptionRepository>();
             services.AddScoped<ILinksRepository, LinksRepository>();
+            services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
+
+            services.AddCronJob<AnalyticSynced>(c =>
+            {
+                c.TimeZoneInfo = TimeZoneInfo.Local;
+                c.CronExpression = @"0 */4 * * *"; // Run every 4 hours
+            });
 
             services.Configure<AzureStorageBlobConfig>(Configuration.GetSection("AzureStorageBlobConfig"));
             services.Configure<Dependencies>(Configuration.GetSection("Dependencies"));
