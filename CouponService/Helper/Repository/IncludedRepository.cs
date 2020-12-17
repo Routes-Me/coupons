@@ -317,5 +317,27 @@ namespace CouponService.Helper.Repository
             var linkList = linksModel.GroupBy(x => x.LinkId).Select(a => a.First()).ToList();
             return Common.SerializeJsonForIncludedRepo(linkList.Cast<dynamic>().ToList());
         }
+
+        public dynamic GetCouponsIncludedData(List<PromotionsModel> promotionsModelList)
+        {
+            List<CouponsModel> couponsModel = new List<CouponsModel>();
+            foreach (var item in promotionsModelList)
+            {
+                var promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.PromotionId), _appSettings.PrimeInverse);
+                var couponsDetails = (from coupon in _context.Coupons
+                                    where coupon.PromotionId == promotionIdDecrypted
+                                    select new CouponsModel()
+                                    {
+                                        CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
+                                        PromotionId = ObfuscationClass.EncodeId(coupon.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                        UserId = ObfuscationClass.EncodeId(coupon.UserId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                        CreatedAt = coupon.CreatedAt
+                                    }).AsEnumerable().FirstOrDefault();
+                if (couponsDetails != null)
+                    couponsModel.Add(couponsDetails);
+            }
+            var couponsList = couponsModel.GroupBy(x => x.CouponId).Select(a => a.First()).ToList();
+            return Common.SerializeJsonForIncludedRepo(couponsList.Cast<dynamic>().ToList());
+        }
     }
 }

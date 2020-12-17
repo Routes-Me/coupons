@@ -188,6 +188,10 @@ namespace CouponService.Repository
                             {
                                 includeData.links = _includedRepository.GetLinksIncludedData(promotionsModelList);
                             }
+                            else if (item.ToLower() == "coupon" || item.ToLower() == "coupons")
+                            {
+                                includeData.coupons = _includedRepository.GetCouponsIncludedData(promotionsModelList);
+                            }
                         }
                     }
                 }
