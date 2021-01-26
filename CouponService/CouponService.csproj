@@ -31,8 +31,8 @@
     <PackageReference Include="RestSharp" Version="106.11.5" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Obfuscation">
-      <HintPath>DLL\Obfuscation.dll</HintPath>
+    <Reference Include="RoutesSecurity">
+      <HintPath>DLL\RoutesSecurity.dll</HintPath>
     </Reference>
     <Reference Include="Transposition">
       <HintPath>DLL\Transposition.dll</HintPath>

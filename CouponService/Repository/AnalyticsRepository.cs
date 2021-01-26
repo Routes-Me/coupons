@@ -6,7 +6,7 @@ using CouponService.Models.ResponseModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Obfuscation;
+using RoutesSecurity;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -54,9 +54,9 @@ namespace CouponService.Repository
                         {
                             var items = group.FirstOrDefault();
                             PromotionAnalytics promotionAnalytics = new PromotionAnalytics();
-                            promotionAnalytics.PromotionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.PromotionId, _appSettings.Prime).ToString();
-                            promotionAnalytics.AdvertismentId = ObfuscationClass.EncodeId(items.Coupon.Promotion.AdvertisementId.GetValueOrDefault(), _appSettings.Prime).ToString();
-                            promotionAnalytics.InstitutionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.InstitutionId.GetValueOrDefault(), _appSettings.Prime).ToString();
+                            promotionAnalytics.PromotionId = Obfuscation.Encode(items.Coupon.Promotion.PromotionId);
+                            promotionAnalytics.AdvertismentId = Obfuscation.Encode(Convert.ToInt32(items.Coupon.Promotion.AdvertisementId));
+                            promotionAnalytics.InstitutionId = Obfuscation.Encode(Convert.ToInt32(items.Coupon.Promotion.InstitutionId));
                             promotionAnalytics.CreatedAt = DateTime.Now;
                             promotionAnalytics.Count = group.Count();
                             promotionAnalytics.Type = "coupons";
@@ -93,16 +93,15 @@ namespace CouponService.Repository
                         {
                             var items = group.FirstOrDefault();
                             PromotionAnalytics promotionAnalytics = new PromotionAnalytics();
-                            promotionAnalytics.PromotionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.PromotionId, _appSettings.Prime).ToString();
-                            promotionAnalytics.AdvertismentId = ObfuscationClass.EncodeId(items.Coupon.Promotion.AdvertisementId.GetValueOrDefault(), _appSettings.Prime).ToString();
-                            promotionAnalytics.InstitutionId = ObfuscationClass.EncodeId(items.Coupon.Promotion.InstitutionId.GetValueOrDefault(), _appSettings.Prime).ToString();
+                            promotionAnalytics.PromotionId = Obfuscation.Encode(items.Coupon.Promotion.PromotionId).ToString();
+                            promotionAnalytics.AdvertismentId = Obfuscation.Encode(Convert.ToInt32(items.Coupon.Promotion.AdvertisementId));
+                            promotionAnalytics.InstitutionId = Obfuscation.Encode(Convert.ToInt32(items.Coupon.Promotion.InstitutionId));
                             promotionAnalytics.CreatedAt = DateTime.Now;
                             promotionAnalytics.Count = group.Count();
                             promotionAnalytics.Type = "coupons";
                             promotionAnalyticsList.Add(promotionAnalytics);
                         }
                     }
-
                     if (promotionAnalyticsList != null && promotionAnalyticsList.Count > 0)
                     {
                         AnalyticsModel analyticsModel = new AnalyticsModel()

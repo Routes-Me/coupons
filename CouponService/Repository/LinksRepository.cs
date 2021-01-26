@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using Obfuscation;
+using RoutesSecurity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +31,7 @@ namespace CouponService.Repository
         {
             try
             {
-                int linkIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int linkIdDecrypted = Obfuscation.Decode(id);
                 var link = _context.Links.Include(x => x.Promotion).Where(x => x.LinkId == linkIdDecrypted).FirstOrDefault();
                 if (link == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.LinksNotFound, StatusCodes.Status404NotFound);
@@ -55,8 +55,8 @@ namespace CouponService.Repository
             int totalCount = 0;
             try
             {
-                int linkIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
-                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(promotionId), _appSettings.PrimeInverse);
+                int linkIdDecrypted = Obfuscation.Decode(id);
+                int promotionIdDecrypted = Obfuscation.Decode(promotionId);
                 List<LinksModel> linkModelList = new List<LinksModel>();
                 if (linkIdDecrypted == 0)
                 {
@@ -65,8 +65,8 @@ namespace CouponService.Repository
                         linkModelList = (from link in _context.Links
                                          select new LinksModel()
                                          {
-                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
-                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             LinkId = Obfuscation.Encode(link.LinkId),
+                                             PromotionId = Obfuscation.Encode(Convert.ToInt32(link.PromotionId)),
                                              Web = link.Web,
                                              Ios = link.Ios,
                                              Android = link.Android
@@ -80,8 +80,8 @@ namespace CouponService.Repository
                                          where link.PromotionId == promotionIdDecrypted
                                          select new LinksModel()
                                          {
-                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
-                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             LinkId = Obfuscation.Encode(link.LinkId),
+                                             PromotionId = Obfuscation.Encode(Convert.ToInt32(link.PromotionId)),
                                              Web = link.Web,
                                              Ios = link.Ios,
                                              Android = link.Android
@@ -100,8 +100,8 @@ namespace CouponService.Repository
                                          where link.LinkId == linkIdDecrypted
                                          select new LinksModel()
                                          {
-                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
-                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             LinkId = Obfuscation.Encode(link.LinkId),
+                                             PromotionId = Obfuscation.Encode(Convert.ToInt32(link.PromotionId)),
                                              Web = link.Web,
                                              Ios = link.Ios,
                                              Android = link.Android
@@ -115,8 +115,8 @@ namespace CouponService.Repository
                                          where link.LinkId == linkIdDecrypted && link.PromotionId == promotionIdDecrypted
                                          select new LinksModel()
                                          {
-                                             LinkId = ObfuscationClass.EncodeId(link.LinkId, _appSettings.Prime).ToString(),
-                                             PromotionId = ObfuscationClass.EncodeId(link.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                             LinkId = Obfuscation.Encode(link.LinkId),
+                                             PromotionId = Obfuscation.Encode(Convert.ToInt32(link.PromotionId)),
                                              Web = link.Web,
                                              Ios = link.Ios,
                                              Android = link.Android
@@ -170,7 +170,7 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PromotionId), _appSettings.PrimeInverse);
+                int promotionIdDecrypted = Obfuscation.Decode(model.PromotionId);
                 Links link = new Links()
                 {
                     PromotionId = promotionIdDecrypted,
@@ -195,8 +195,8 @@ namespace CouponService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                int linkIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.LinkId), _appSettings.PrimeInverse);
-                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PromotionId), _appSettings.PrimeInverse);
+                int linkIdDecrypted = Obfuscation.Decode(model.LinkId);
+                int promotionIdDecrypted = Obfuscation.Decode(model.PromotionId);
 
                 var links = _context.Links.Where(x => x.LinkId == linkIdDecrypted).FirstOrDefault();
                 if (links == null)
