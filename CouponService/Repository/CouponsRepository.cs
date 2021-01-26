@@ -54,22 +54,19 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetCoupons(string id, string userId, string promotionsId, Pagination pageInfo, string includeType)
+        public dynamic GetCoupons(string couponId, string userId, string promotionsId, Pagination pageInfo, string includeType)
         {
             CouponGetResponse response = new CouponGetResponse();
             int totalCount = 0;
             try
             {
-                int couponIdDecrypted = Obfuscation.Decode(id);
-                int userIdDecrypted = Obfuscation.Decode(userId);
-                int promotionsIdDecrypted = Obfuscation.Decode(promotionsId);
                 List<CouponsModel> placeModelList = new List<CouponsModel>();
 
-                if (userIdDecrypted == 0)
+                if (string.IsNullOrEmpty(userId))
                 {
-                    if (couponIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(couponId))
                     {
-                        if (promotionsIdDecrypted == 0)
+                        if (string.IsNullOrEmpty(promotionsId))
                         {
                             placeModelList = (from coupon in _context.Coupons
                                               select new CouponsModel()
@@ -84,6 +81,7 @@ namespace CouponService.Repository
                         }
                         else
                         {
+                            int promotionsIdDecrypted = Obfuscation.Decode(promotionsId);
                             placeModelList = (from coupon in _context.Coupons
                                               where coupon.PromotionId == promotionsIdDecrypted
                                               select new CouponsModel()
@@ -96,12 +94,12 @@ namespace CouponService.Repository
 
                             totalCount = _context.Coupons.ToList().Count();
                         }
-
                     }
                     else
                     {
-                        if (promotionsIdDecrypted == 0)
+                        if (string.IsNullOrEmpty(promotionsId))
                         {
+                            int couponIdDecrypted = Obfuscation.Decode(couponId);
                             placeModelList = (from coupon in _context.Coupons
                                               where coupon.CouponId == couponIdDecrypted
                                               select new CouponsModel()
@@ -116,6 +114,8 @@ namespace CouponService.Repository
                         }
                         else
                         {
+                            int couponIdDecrypted = Obfuscation.Decode(couponId);
+                            int promotionsIdDecrypted = Obfuscation.Decode(promotionsId);
                             placeModelList = (from coupon in _context.Coupons
                                               where coupon.CouponId == couponIdDecrypted && coupon.PromotionId == promotionsIdDecrypted
                                               select new CouponsModel()
@@ -128,15 +128,15 @@ namespace CouponService.Repository
 
                             totalCount = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted).ToList().Count();
                         }
-
                     }
                 }
                 else
                 {
-                    if (couponIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(couponId))
                     {
-                        if (promotionsIdDecrypted == 0)
+                        if (string.IsNullOrEmpty(promotionsId))
                         {
+                            int userIdDecrypted = Obfuscation.Decode(userId);
                             placeModelList = (from coupon in _context.Coupons
                                               where coupon.UserId == userIdDecrypted
                                               select new CouponsModel()
@@ -151,6 +151,8 @@ namespace CouponService.Repository
                         }
                         else
                         {
+                            int userIdDecrypted = Obfuscation.Decode(userId);
+                            int promotionsIdDecrypted = Obfuscation.Decode(promotionsId);
                             placeModelList = (from coupon in _context.Coupons
                                               where coupon.UserId == userIdDecrypted && coupon.PromotionId == promotionsIdDecrypted
                                               select new CouponsModel()
@@ -167,8 +169,10 @@ namespace CouponService.Repository
                     }
                     else
                     {
-                        if (promotionsIdDecrypted == 0)
+                        if (string.IsNullOrEmpty(promotionsId))
                         {
+                            int couponIdDecrypted = Obfuscation.Decode(couponId);
+                            int userIdDecrypted = Obfuscation.Decode(userId);
                             placeModelList = (from coupon in _context.Coupons
                                               where coupon.CouponId == couponIdDecrypted && coupon.UserId == userIdDecrypted
                                               select new CouponsModel()
@@ -183,6 +187,9 @@ namespace CouponService.Repository
                         }
                         else
                         {
+                            int couponIdDecrypted = Obfuscation.Decode(couponId);
+                            int userIdDecrypted = Obfuscation.Decode(userId);
+                            int promotionsIdDecrypted = Obfuscation.Decode(promotionsId);
                             placeModelList = (from coupon in _context.Coupons
                                               where coupon.CouponId == couponIdDecrypted && coupon.UserId == userIdDecrypted && coupon.PromotionId == promotionsIdDecrypted
                                               select new CouponsModel()

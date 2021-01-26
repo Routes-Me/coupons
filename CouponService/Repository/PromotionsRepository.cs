@@ -48,21 +48,18 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetPromotions(string id, string advertisementId, Pagination pageInfo, string includeType)
+        public dynamic GetPromotions(string promotionId, string advertisementId, Pagination pageInfo, string includeType)
         {
             PromotionsGetResponse response = new PromotionsGetResponse();
             int totalCount = 0;
             try
             {
-                int promotionIdDecrypted = Obfuscation.Decode(id);
-                int advertisementIdDecrypted = Obfuscation.Decode(advertisementId);
-
                 Transposition transposition = new Transposition();
                 List<PromotionsModel> promotionsModelList = new List<PromotionsModel>();
 
-                if (promotionIdDecrypted == 0)
+                if (string.IsNullOrEmpty(promotionId))
                 {
-                    if (advertisementIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(advertisementId))
                     {
                         promotionsModelList = (from promotion in _context.Promotions
                                                select new PromotionsModel()
@@ -87,6 +84,7 @@ namespace CouponService.Repository
                     }
                     else
                     {
+                        int advertisementIdDecrypted = Obfuscation.Decode(advertisementId);
                         promotionsModelList = (from promotion in _context.Promotions
                                                where promotion.AdvertisementId == advertisementIdDecrypted
                                                select new PromotionsModel()
@@ -112,8 +110,9 @@ namespace CouponService.Repository
                 }
                 else
                 {
-                    if (advertisementIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(advertisementId))
                     {
+                        int promotionIdDecrypted = Obfuscation.Decode(promotionId);
                         promotionsModelList = (from promotion in _context.Promotions
                                                where promotion.PromotionId == promotionIdDecrypted
                                                select new PromotionsModel()
@@ -138,6 +137,8 @@ namespace CouponService.Repository
                     }
                     else
                     {
+                        int promotionIdDecrypted = Obfuscation.Decode(promotionId);
+                        int advertisementIdDecrypted = Obfuscation.Decode(advertisementId);
                         promotionsModelList = (from promotion in _context.Promotions
                                                where promotion.PromotionId == promotionIdDecrypted && promotion.AdvertisementId == advertisementIdDecrypted
                                                select new PromotionsModel()
@@ -213,15 +214,14 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetPromotionsByAdvertisementsId(string id, Pagination pageInfo)
+        public dynamic GetPromotionsByAdvertisementsId(string advertisementId, Pagination pageInfo)
         {
             PromotionsForContentGetResponse response = new PromotionsForContentGetResponse();
             int totalCount = 0;
             try
             {
-                int advertisementIdDecrypted = Obfuscation.Decode(id);
                 List<PromotionsModel> promotionsModelList = new List<PromotionsModel>();
-                if (advertisementIdDecrypted == 0)
+                if (string.IsNullOrEmpty(advertisementId))
                 {
                     promotionsModelList = (from promotion in _context.Promotions
                                            select new PromotionsModel()
@@ -246,6 +246,7 @@ namespace CouponService.Repository
                 }
                 else
                 {
+                    int advertisementIdDecrypted = Obfuscation.Decode(advertisementId);
                     promotionsModelList = (from promotion in _context.Promotions
                                            where promotion.AdvertisementId == advertisementIdDecrypted
                                            select new PromotionsModel()

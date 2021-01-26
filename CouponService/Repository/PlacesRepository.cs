@@ -44,15 +44,14 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetPlaces(string id, Pagination pageInfo)
+        public dynamic GetPlaces(string placeId, Pagination pageInfo)
         {
             PlacesGetResponse response = new PlacesGetResponse();
             int totalCount = 0;
             try
             {
-                int placeIdDecrypted = Obfuscation.Decode(id);
                 List<PlacesModel> placeModelList = new List<PlacesModel>();
-                if (placeIdDecrypted == 0)
+                if (string.IsNullOrEmpty(placeId))
                 {
                     placeModelList = (from place in _context.Places
                                       select new PlacesModel()
@@ -67,6 +66,7 @@ namespace CouponService.Repository
                 }
                 else
                 {
+                    int placeIdDecrypted = Obfuscation.Decode(placeId);
                     placeModelList = (from place in _context.Places
                                       where place.PlaceId == placeIdDecrypted
                                       select new PlacesModel()

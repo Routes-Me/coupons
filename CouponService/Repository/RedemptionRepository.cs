@@ -54,19 +54,17 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetRedemption(string id, string officerId, Pagination pageInfo, string includedType)
+        public dynamic GetRedemption(string redemptionId, string officerId, Pagination pageInfo, string includedType)
         {
             RedemptionGetResponse response = new RedemptionGetResponse();
             int totalCount = 0;
             try
             {
-                int redemptionIdDecrypted = Obfuscation.Decode(id);
-                int officerIdDecrypted = Obfuscation.Decode(officerId);
                 List<RedemptionGetModel> redemptionModelList = new List<RedemptionGetModel>();
 
-                if (officerIdDecrypted == 0)
+                if (string.IsNullOrEmpty(officerId))
                 {
-                    if (redemptionIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(redemptionId))
                     {
                         redemptionModelList = (from redemption in _context.Redemptions
                                                select new RedemptionGetModel()
@@ -81,6 +79,7 @@ namespace CouponService.Repository
                     }
                     else
                     {
+                        int redemptionIdDecrypted = Obfuscation.Decode(redemptionId);
                         redemptionModelList = (from redemption in _context.Redemptions
                                                where redemption.RedemptionId == redemptionIdDecrypted
                                                select new RedemptionGetModel()
@@ -96,8 +95,9 @@ namespace CouponService.Repository
                 }
                 else
                 {
-                    if (redemptionIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(redemptionId))
                     {
+                        int officerIdDecrypted = Obfuscation.Decode(officerId);
                         redemptionModelList = (from redemption in _context.Redemptions
                                                where redemption.OfficerId == officerIdDecrypted
                                                select new RedemptionGetModel()
@@ -112,6 +112,8 @@ namespace CouponService.Repository
                     }
                     else
                     {
+                        int redemptionIdDecrypted = Obfuscation.Decode(redemptionId);
+                        int officerIdDecrypted = Obfuscation.Decode(officerId);
                         redemptionModelList = (from redemption in _context.Redemptions
                                                where redemption.RedemptionId == redemptionIdDecrypted && redemption.OfficerId == officerIdDecrypted
                                                select new RedemptionGetModel()

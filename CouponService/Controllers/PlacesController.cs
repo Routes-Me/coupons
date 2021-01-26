@@ -27,10 +27,10 @@ namespace CouponService.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("places/{id=0}")]
-        public IActionResult Get(string id, [FromQuery] Pagination pageInfo)
+        [Route("places/{placeId?}")]
+        public IActionResult Get(string placeId, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _placesRepository.GetPlaces(id, pageInfo);
+            dynamic response = _placesRepository.GetPlaces(placeId, pageInfo);
             return StatusCode((int)response.statusCode, response);
         }
 

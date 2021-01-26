@@ -25,10 +25,10 @@ namespace CouponService.Controllers
         }
 
         [HttpGet]
-        [Route("coupons/{id=0}")]
-        public IActionResult Get(string id, string userId, string promotionId, string Include, [FromQuery] Pagination pageInfo)
+        [Route("coupons/{couponId?}")]
+        public IActionResult Get(string couponId, string userId, string promotionId, string Include, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _couponsRepository.GetCoupons(id, userId, promotionId, pageInfo, Include);
+            dynamic response = _couponsRepository.GetCoupons(couponId, userId, promotionId, pageInfo, Include);
             return StatusCode((int)response.statusCode, response);
         }
 

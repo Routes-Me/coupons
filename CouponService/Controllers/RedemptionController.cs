@@ -25,10 +25,10 @@ namespace CouponService.Controllers
         }
 
         [HttpGet]
-        [Route("coupons/redeem/{id=0}")]
-        public IActionResult Get(string id, string officerId, string Include, [FromQuery] Pagination pageInfo)
+        [Route("coupons/redeem/{redemptionId?}")]
+        public IActionResult Get(string redemptionId, string officerId, string Include, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _redemptionRepository.GetRedemption(id, officerId, pageInfo, Include);
+            dynamic response = _redemptionRepository.GetRedemption(redemptionId, officerId, pageInfo, Include);
             return StatusCode((int)response.statusCode, response);
         }
 
