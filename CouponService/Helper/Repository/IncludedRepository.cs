@@ -6,7 +6,7 @@ using CouponService.Models.ResponseModel;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Obfuscation;
+using RoutesSecurity;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -91,14 +91,14 @@ namespace CouponService.Helper.Repository
             List<Coupons> coupons = new List<Coupons>();
             foreach (var item in redemptionModelList)
             {
-                var couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.CouponId), _appSettings.PrimeInverse);
+                var couponIdDecrypted = Obfuscation.Decode(item.CouponId);
                 var couponsDetails = (from coupon in _context.Coupons
                                       where coupon.CouponId == couponIdDecrypted
                                       select new Coupons()
                                       {
-                                          CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime),
-                                          PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime),
-                                          UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime),
+                                          CouponId = Convert.ToInt32(Obfuscation.Encode(coupon.CouponId)),
+                                          PromotionId = Convert.ToInt32(Obfuscation.Encode(Convert.ToInt32(coupon.PromotionId))),
+                                          UserId = Convert.ToInt32(Obfuscation.Encode(Convert.ToInt32(coupon.UserId))),
                                           CreatedAt = coupon.CreatedAt,
                                           Promotion = coupon.Promotion
                                       }).AsEnumerable().FirstOrDefault();
@@ -115,11 +115,11 @@ namespace CouponService.Helper.Repository
             List<UserModel> userModel = new List<UserModel>();
             foreach (var item in redemptionModelList)
             {
-                var couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.CouponId), _appSettings.PrimeInverse);
+                var couponIdDecrypted = Obfuscation.Decode(item.CouponId);
                 var couponsDetails = _context.Coupons.Where(x => x.CouponId == couponIdDecrypted).FirstOrDefault();
                 if (couponsDetails != null)
                 {
-                    users.Add(ObfuscationClass.EncodeId(Convert.ToInt32(couponsDetails.UserId), _appSettings.Prime).ToString());
+                    users.Add(Obfuscation.Encode(Convert.ToInt32(couponsDetails.UserId)));
                 }
             }
             foreach (var item in users)
@@ -143,12 +143,12 @@ namespace CouponService.Helper.Repository
             List<PromotionsModel> promotion = new List<PromotionsModel>();
             foreach (var item in couponsModelList)
             {
-                var promoIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.PromotionId), _appSettings.PrimeInverse);
+                var promoIdDecrypted = Obfuscation.Decode(item.PromotionId);
                 var couponsDetails = (from promotions in _context.Promotions
                                       where promotions.PromotionId == promoIdDecrypted
                                       select new PromotionsModel()
                                       {
-                                          PromotionId = ObfuscationClass.EncodeId(promotions.PromotionId, _appSettings.Prime).ToString(),
+                                          PromotionId = Obfuscation.Encode(promotions.PromotionId),
                                           Title = promotions.Title,
                                           Subtitle = promotions.Subtitle,
                                           CreatedAt = promotions.CreatedAt,
@@ -156,8 +156,8 @@ namespace CouponService.Helper.Repository
                                           StartAt = promotions.StartAt,
                                           EndAt = promotions.EndAt,
                                           UsageLimit = promotions.UsageLimit,
-                                          AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotions.AdvertisementId), _appSettings.Prime).ToString(),
-                                          InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotions.InstitutionId), _appSettings.Prime).ToString(),
+                                          AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotions.AdvertisementId)),
+                                          InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotions.InstitutionId)),
                                           IsSharable = promotions.IsSharable,
                                           LogoUrl = promotions.LogoUrl,
                                           Type = promotions.Type
@@ -242,14 +242,14 @@ namespace CouponService.Helper.Repository
             List<Coupons> coupons = new List<Coupons>();
             foreach (var item in redemptionModelList)
             {
-                var couponIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.CouponId), _appSettings.PrimeInverse);
+                var couponIdDecrypted = Obfuscation.Decode(item.CouponId);
                 var couponsDetails = (from coupon in _context.Coupons
                                       where coupon.CouponId == couponIdDecrypted
                                       select new Coupons()
                                       {
-                                          CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime),
-                                          PromotionId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.PromotionId), _appSettings.Prime),
-                                          UserId = ObfuscationClass.EncodeId(Convert.ToInt32(coupon.UserId), _appSettings.Prime),
+                                          CouponId = Convert.ToInt32(Obfuscation.Encode(coupon.CouponId)),
+                                          PromotionId = Convert.ToInt32(Obfuscation.Encode(Convert.ToInt32(coupon.PromotionId))),
+                                          UserId = Convert.ToInt32(Obfuscation.Encode(Convert.ToInt32(coupon.UserId))),
                                           CreatedAt = coupon.CreatedAt,
                                           Promotion = coupon.Promotion
                                       }).AsEnumerable().FirstOrDefault();
@@ -269,12 +269,12 @@ namespace CouponService.Helper.Repository
             List<PromotionsModel> promotion = new List<PromotionsModel>();
             foreach (var item in linkModelList)
             {
-                var promoIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.PromotionId), _appSettings.PrimeInverse);
+                var promoIdDecrypted = Obfuscation.Decode(item.PromotionId);
                 var couponsDetails = (from promotions in _context.Promotions
                                       where promotions.PromotionId == promoIdDecrypted
                                       select new PromotionsModel()
                                       {
-                                          PromotionId = ObfuscationClass.EncodeId(promotions.PromotionId, _appSettings.Prime).ToString(),
+                                          PromotionId = Obfuscation.Encode(promotions.PromotionId),
                                           Title = promotions.Title,
                                           Subtitle = promotions.Subtitle,
                                           CreatedAt = promotions.CreatedAt,
@@ -282,8 +282,8 @@ namespace CouponService.Helper.Repository
                                           StartAt = promotions.StartAt,
                                           EndAt = promotions.EndAt,
                                           UsageLimit = promotions.UsageLimit,
-                                          AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotions.AdvertisementId), _appSettings.Prime).ToString(),
-                                          InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotions.InstitutionId), _appSettings.Prime).ToString(),
+                                          AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotions.AdvertisementId)),
+                                          InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotions.InstitutionId)),
                                           IsSharable = promotions.IsSharable,
                                           LogoUrl = promotions.LogoUrl,
                                           Type = promotions.Type
@@ -300,13 +300,13 @@ namespace CouponService.Helper.Repository
             List<LinksModel> linksModel = new List<LinksModel>();
             foreach (var item in promotionsModelList)
             {
-                var promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.PromotionId), _appSettings.PrimeInverse);
+                var promotionIdDecrypted = Obfuscation.Decode(item.PromotionId);
                 var linksDetails = (from links in _context.Links
                                     where links.PromotionId == promotionIdDecrypted
                                     select new LinksModel()
                                     {
-                                        LinkId = ObfuscationClass.EncodeId(links.LinkId, _appSettings.Prime).ToString(),
-                                        PromotionId = ObfuscationClass.EncodeId(links.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                        LinkId = Obfuscation.Encode(links.LinkId),
+                                        PromotionId = Obfuscation.Encode(Convert.ToInt32(links.PromotionId)),
                                         Web = links.Web,
                                         Ios = links.Ios,
                                         Android = links.Android
@@ -323,14 +323,14 @@ namespace CouponService.Helper.Repository
             List<CouponsModel> couponsModel = new List<CouponsModel>();
             foreach (var item in promotionsModelList)
             {
-                var promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.PromotionId), _appSettings.PrimeInverse);
+                var promotionIdDecrypted = Obfuscation.Decode(item.PromotionId);
                 var couponsDetails = (from coupon in _context.Coupons
                                     where coupon.PromotionId == promotionIdDecrypted
                                     select new CouponsModel()
                                     {
-                                        CouponId = ObfuscationClass.EncodeId(coupon.CouponId, _appSettings.Prime).ToString(),
-                                        PromotionId = ObfuscationClass.EncodeId(coupon.PromotionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
-                                        UserId = ObfuscationClass.EncodeId(coupon.UserId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                        CouponId = Obfuscation.Encode(coupon.CouponId),
+                                        PromotionId = Obfuscation.Encode(Convert.ToInt32(coupon.PromotionId)),
+                                        UserId = Obfuscation.Encode(Convert.ToInt32(coupon.UserId)),
                                         CreatedAt = coupon.CreatedAt
                                     }).AsEnumerable().FirstOrDefault();
                 if (couponsDetails != null)

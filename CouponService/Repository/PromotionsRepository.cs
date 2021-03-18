@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using Obfuscation;
+using RoutesSecurity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace CouponService.Repository
         {
             try
             {
-                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int promotionIdDecrypted = Obfuscation.Decode(id);
                 var promotion = _context.Promotions.Include(x => x.PromotionsPlaces).Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
                 if (promotion == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.PromotionsNotFound, StatusCodes.Status404NotFound);
@@ -48,30 +48,27 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetPromotions(string id, string advertisementId, Pagination pageInfo, string includeType)
+        public dynamic GetPromotions(string promotionId, string advertisementId, Pagination pageInfo, string includeType)
         {
             PromotionsGetResponse response = new PromotionsGetResponse();
             int totalCount = 0;
             try
             {
-                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
-                int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(advertisementId), _appSettings.PrimeInverse);
-
                 Transposition transposition = new Transposition();
                 List<PromotionsModel> promotionsModelList = new List<PromotionsModel>();
 
-                if (promotionIdDecrypted == 0)
+                if (string.IsNullOrEmpty(promotionId))
                 {
-                    if (advertisementIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(advertisementId))
                     {
                         promotionsModelList = (from promotion in _context.Promotions
                                                select new PromotionsModel()
                                                {
-                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   PromotionId = Obfuscation.Encode(promotion.PromotionId),
+                                                   AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotion.AdvertisementId)),
                                                    CreatedAt = promotion.CreatedAt,
                                                    EndAt = promotion.EndAt,
-                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotion.InstitutionId)),
                                                    IsSharable = promotion.IsSharable,
                                                    LogoUrl = promotion.LogoUrl,
                                                    StartAt = promotion.StartAt,
@@ -87,15 +84,16 @@ namespace CouponService.Repository
                     }
                     else
                     {
+                        int advertisementIdDecrypted = Obfuscation.Decode(advertisementId);
                         promotionsModelList = (from promotion in _context.Promotions
                                                where promotion.AdvertisementId == advertisementIdDecrypted
                                                select new PromotionsModel()
                                                {
-                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   PromotionId = Obfuscation.Encode(promotion.PromotionId),
+                                                   AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotion.AdvertisementId)),
                                                    CreatedAt = promotion.CreatedAt,
                                                    EndAt = promotion.EndAt,
-                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotion.InstitutionId)),
                                                    IsSharable = promotion.IsSharable,
                                                    LogoUrl = promotion.LogoUrl,
                                                    StartAt = promotion.StartAt,
@@ -112,17 +110,18 @@ namespace CouponService.Repository
                 }
                 else
                 {
-                    if (advertisementIdDecrypted == 0)
+                    if (string.IsNullOrEmpty(advertisementId))
                     {
+                        int promotionIdDecrypted = Obfuscation.Decode(promotionId);
                         promotionsModelList = (from promotion in _context.Promotions
                                                where promotion.PromotionId == promotionIdDecrypted
                                                select new PromotionsModel()
                                                {
-                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   PromotionId = Obfuscation.Encode(promotion.PromotionId),
+                                                   AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotion.AdvertisementId)),
                                                    CreatedAt = promotion.CreatedAt,
                                                    EndAt = promotion.EndAt,
-                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotion.InstitutionId)),
                                                    IsSharable = promotion.IsSharable,
                                                    LogoUrl = promotion.LogoUrl,
                                                    StartAt = promotion.StartAt,
@@ -138,15 +137,17 @@ namespace CouponService.Repository
                     }
                     else
                     {
+                        int promotionIdDecrypted = Obfuscation.Decode(promotionId);
+                        int advertisementIdDecrypted = Obfuscation.Decode(advertisementId);
                         promotionsModelList = (from promotion in _context.Promotions
                                                where promotion.PromotionId == promotionIdDecrypted && promotion.AdvertisementId == advertisementIdDecrypted
                                                select new PromotionsModel()
                                                {
-                                                   PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                                   AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                                   PromotionId = Obfuscation.Encode(promotion.PromotionId),
+                                                   AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotion.AdvertisementId)),
                                                    CreatedAt = promotion.CreatedAt,
                                                    EndAt = promotion.EndAt,
-                                                   InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                                   InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotion.InstitutionId)),
                                                    IsSharable = promotion.IsSharable,
                                                    LogoUrl = promotion.LogoUrl,
                                                    StartAt = promotion.StartAt,
@@ -213,24 +214,23 @@ namespace CouponService.Repository
             }
         }
 
-        public dynamic GetPromotionsByAdvertisementsId(string id, Pagination pageInfo)
+        public dynamic GetPromotionsByAdvertisementsId(string advertisementId, Pagination pageInfo)
         {
             PromotionsForContentGetResponse response = new PromotionsForContentGetResponse();
             int totalCount = 0;
             try
             {
-                int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
                 List<PromotionsModel> promotionsModelList = new List<PromotionsModel>();
-                if (advertisementIdDecrypted == 0)
+                if (string.IsNullOrEmpty(advertisementId))
                 {
                     promotionsModelList = (from promotion in _context.Promotions
                                            select new PromotionsModel()
                                            {
-                                               PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                               AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                               PromotionId = Obfuscation.Encode(promotion.PromotionId),
+                                               AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotion.AdvertisementId)),
                                                CreatedAt = promotion.CreatedAt,
                                                EndAt = promotion.EndAt,
-                                               InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                               InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotion.InstitutionId)),
                                                IsSharable = promotion.IsSharable,
                                                LogoUrl = promotion.LogoUrl,
                                                StartAt = promotion.StartAt,
@@ -246,15 +246,16 @@ namespace CouponService.Repository
                 }
                 else
                 {
+                    int advertisementIdDecrypted = Obfuscation.Decode(advertisementId);
                     promotionsModelList = (from promotion in _context.Promotions
                                            where promotion.AdvertisementId == advertisementIdDecrypted
                                            select new PromotionsModel()
                                            {
-                                               PromotionId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString(),
-                                               AdvertisementId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.AdvertisementId), _appSettings.Prime).ToString(),
+                                               PromotionId = Obfuscation.Encode(promotion.PromotionId),
+                                               AdvertisementId = Obfuscation.Encode(Convert.ToInt32(promotion.AdvertisementId)),
                                                CreatedAt = promotion.CreatedAt,
                                                EndAt = promotion.EndAt,
-                                               InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(promotion.InstitutionId), _appSettings.Prime).ToString(),
+                                               InstitutionId = Obfuscation.Encode(Convert.ToInt32(promotion.InstitutionId)),
                                                IsSharable = promotion.IsSharable,
                                                LogoUrl = promotion.LogoUrl,
                                                StartAt = promotion.StartAt,
@@ -333,8 +334,8 @@ namespace CouponService.Repository
                         model.EndAt = DateTime.Now.AddMonths(1);
                 }
 
-                int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
+                int advertisementIdDecrypted = Obfuscation.Decode(model.AdvertisementId);
+                int institutionIdDecrypted = Obfuscation.Decode(model.InstitutionId);
 
                 Promotions promotion = new Promotions()
                 {
@@ -356,7 +357,7 @@ namespace CouponService.Repository
 
                 if (!string.IsNullOrEmpty(model.PlaceId))
                 {
-                    int placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
+                    int placeIdDecrypted = Obfuscation.Decode(model.PlaceId);
                     PromotionsPlaces promotionsPlace = new PromotionsPlaces()
                     {
                         PromotionId = promotion.PromotionId,
@@ -387,7 +388,7 @@ namespace CouponService.Repository
                 response.status = true;
                 response.statusCode = StatusCodes.Status201Created;
                 response.message = CommonMessage.PromotionsInsert;
-                response.promotionsId = ObfuscationClass.EncodeId(promotion.PromotionId, _appSettings.Prime).ToString();
+                response.promotionsId = Obfuscation.Encode(promotion.PromotionId);
                 return response;
             }
             catch (Exception ex)
@@ -439,9 +440,9 @@ namespace CouponService.Repository
                         model.EndAt = DateTime.Now.AddMonths(1);
                 }
 
-                int promotionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PromotionId), _appSettings.PrimeInverse);
-                int advertisementIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.AdvertisementId), _appSettings.PrimeInverse);
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
+                int promotionIdDecrypted = Obfuscation.Decode(model.PromotionId);
+                int advertisementIdDecrypted = Obfuscation.Decode(model.AdvertisementId);
+                int institutionIdDecrypted = Obfuscation.Decode(model.InstitutionId);
                 int placeIdDecrypted = 0;
 
                 var promotion = _context.Promotions.Include(x => x.PromotionsPlaces).Include(x => x.Links).Where(x => x.PromotionId == promotionIdDecrypted).FirstOrDefault();
@@ -450,7 +451,7 @@ namespace CouponService.Repository
 
                 if (!string.IsNullOrEmpty(model.PlaceId))
                 {
-                    placeIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.PlaceId), _appSettings.PrimeInverse);
+                    placeIdDecrypted = Obfuscation.Decode(model.PlaceId);
                     var place = _context.Places.Where(x => x.PlaceId == placeIdDecrypted).FirstOrDefault();
                     if (place == null)
                         return ReturnResponse.ErrorResponse(CommonMessage.PlacesNotFound, StatusCodes.Status404NotFound);

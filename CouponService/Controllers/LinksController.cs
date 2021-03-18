@@ -29,10 +29,10 @@ namespace CouponService.Controllers
         }
 
         [HttpGet]
-        [Route("links/{id=0}")]
-        public IActionResult Get(string id, string promotionId, string include, [FromQuery] Pagination pageInfo)
+        [Route("links/{linkId?}")]
+        public IActionResult Get(string linkId, string promotionId, string include, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _linksRepository.GetLinks(id, promotionId, pageInfo, include);
+            dynamic response = _linksRepository.GetLinks(linkId, promotionId, pageInfo, include);
             return StatusCode((int)response.statusCode, response);
         }
 
