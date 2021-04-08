@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CouponService.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
     public class PlacesController : ControllerBase
     {
         private readonly IPlacesRepository _placesRepository;
