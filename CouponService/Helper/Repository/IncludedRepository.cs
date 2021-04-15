@@ -225,7 +225,8 @@ namespace CouponService.Helper.Repository
         public dynamic GetPinData(string institutionId)
         {
             List<AuthoritiesModel> lstAuthorities = new List<AuthoritiesModel>();
-            var client = new RestClient((_appSettings.Host + _dependencies.AuthoritiesUrl).Replace("__id", institutionId));
+            UriBuilder uriBuilder = new UriBuilder(_appSettings.Host + _dependencies.InstitutionUrl + institutionId + "/authorities");
+            var client = new RestClient(uriBuilder.Uri);
             var request = new RestRequest(Method.GET);
             IRestResponse response = client.Execute(request);
             if (response.StatusCode == HttpStatusCode.OK)
