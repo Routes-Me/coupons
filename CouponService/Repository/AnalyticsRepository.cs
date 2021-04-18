@@ -34,7 +34,7 @@ namespace CouponService.Repository
             {
                 DateTime? lastCouponDate = null;
                 UriBuilder uriBuilder = new UriBuilder(_appSettings.Host + _dependencies.AnalyticsUrl + "lastdate");
-                uriBuilder.Query = "type=coupons";
+                uriBuilder = AppendQueryToUrl(uriBuilder, "type=coupons");
                 var client = new RestClient(uriBuilder.Uri);
                 var request = new RestRequest(Method.GET);
                 IRestResponse response = client.Execute(request);
@@ -129,6 +129,15 @@ namespace CouponService.Repository
 
             }
 
+        }
+
+        private UriBuilder AppendQueryToUrl(UriBuilder baseUri, string queryToAppend)
+        {
+            if (baseUri.Query != null && baseUri.Query.Length > 1)
+                baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
+            else
+                baseUri.Query = queryToAppend;
+            return baseUri;
         }
     }
 }
