@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CouponService.Abstraction;
+﻿using CouponService.Abstraction;
 using CouponService.Models;
 using CouponService.Models.ResponseModel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CouponService.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
     public class LinksController : ControllerBase
     {
         private readonly ILinksRepository _linksRepository;

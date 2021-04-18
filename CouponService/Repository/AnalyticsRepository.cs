@@ -33,7 +33,9 @@ namespace CouponService.Repository
             try
             {
                 DateTime? lastCouponDate = null;
-                var client = new RestClient(_appSettings.Host + _dependencies.GetAnalyticsUrl + "coupons");
+                UriBuilder uriBuilder = new UriBuilder(_appSettings.Host + _dependencies.AnalyticsUrl + "lastdate");
+                uriBuilder = AppendQueryToUrl(uriBuilder, "type=coupons");
+                var client = new RestClient(uriBuilder.Uri);
                 var request = new RestRequest(Method.GET);
                 IRestResponse response = client.Execute(request);
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -71,7 +73,7 @@ namespace CouponService.Repository
                             analytics = promotionAnalyticsList
                         };
 
-                        var postClient = new RestClient(_appSettings.Host + _dependencies.PostAnalyticsUrl);
+                        var postClient = new RestClient(_appSettings.Host + _dependencies.AnalyticsUrl);
                         var postRequest = new RestRequest(Method.POST);
                         string jsonToSend = JsonConvert.SerializeObject(analyticsModel);
                         postRequest.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
@@ -109,7 +111,7 @@ namespace CouponService.Repository
                             analytics = promotionAnalyticsList
                         };
 
-                        var postClient = new RestClient(_appSettings.Host + _dependencies.PostAnalyticsUrl);
+                        var postClient = new RestClient(_appSettings.Host + _dependencies.AnalyticsUrl);
                         var postRequest = new RestRequest(Method.POST);
                         string jsonToSend = JsonConvert.SerializeObject(analyticsModel);
                         postRequest.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
@@ -127,6 +129,15 @@ namespace CouponService.Repository
 
             }
 
+        }
+
+        private UriBuilder AppendQueryToUrl(UriBuilder baseUri, string queryToAppend)
+        {
+            if (baseUri.Query != null && baseUri.Query.Length > 1)
+                baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
+            else
+                baseUri.Query = queryToAppend;
+            return baseUri;
         }
     }
 }

@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CouponService.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
     public class PromotionsController : ControllerBase
     {
         private readonly IPromotionsRepository _promotionsRepository;

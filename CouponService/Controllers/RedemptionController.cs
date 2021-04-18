@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CouponService.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
     public class RedemptionController : ControllerBase
     {
         private readonly IRedemptionRepository _redemptionRepository;

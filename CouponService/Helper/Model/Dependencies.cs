@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace CouponService.Helper.Model
+﻿namespace CouponService.Helper.Model
 {
     public class Dependencies
     {
@@ -11,9 +6,6 @@ namespace CouponService.Helper.Model
         public string InstitutionUrl { get; set; }
         public string AdvertisementsUrl { get; set; }
         public string OfficersUrl { get; set; }
-        public string AuthoritiesUrl { get; set; }
-        public string GetAnalyticsUrl { get; set; }
-        public string PostAnalyticsUrl { get; set; }
-
+        public string AnalyticsUrl { get; set; }
     }
 }
